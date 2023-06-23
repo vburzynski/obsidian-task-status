@@ -1,10 +1,23 @@
-# top-most EditorConfig file
+# editorconfig.org
 root = true
 
 [*]
 charset = utf-8
 end_of_line = lf
+indent_size = 2
+indent_style = space
+max_line_length = 100
 insert_final_newline = true
+trim_trailing_whitespace = true
+
+# because whitespaces are important in diff files
+# because two or more spaces at the end of a markdown line is a newline
+[*.{diff,md,mdx}]
+trim_trailing_whitespace = false
+
+[{Makefile,**.mk}]
 indent_style = tab
-indent_size = 4
-tab_width = 4
+
+# Batch Files
+[*.{cmd,bat}]
+end_of_line = crlf
