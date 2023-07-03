@@ -2,9 +2,11 @@ import { Plugin, TAbstractFile } from 'obsidian';
 import { MyPluginInterface, MyPluginSettings } from 'src/types';
 import Settings from 'src/settings';
 import openSampleModalSimple from 'src/commands/open-sample-modal-simple';
-import sampleEditorCommand from 'src/commands/sample-editor-command';
+import sampleEditorCommand from 'src/commands/test-command';
 import openSampleModalComplex from 'src/commands/open-sample-modal-complex';
 import registerRibbon from 'src/register-ribbon';
+import testCommand from 'src/commands/test-command';
+import quickActionMenu from 'src/commands/quick-action-menu';
 
 const DEFAULT_SETTINGS: MyPluginSettings = {
   mySetting: 'default'
@@ -15,20 +17,15 @@ export default class MyPlugin extends Plugin implements MyPluginInterface {
 
   async onload() {
     await this.loadSettings();
-
     registerRibbon(this);
 
     this.addCommand(openSampleModalSimple(this));
     this.addCommand(sampleEditorCommand(this));
     this.addCommand(openSampleModalComplex(this));
+    this.addCommand(testCommand(this));
+    this.addCommand(quickActionMenu(this));
 
     this.addSettingTab(new Settings(this.app, this));
-
-    // If the plugin hooks up any global DOM events (on parts of the app that doesn't belong to this plugin)
-    // Using this function will automatically remove the event listener when this plugin is disabled.
-    // this.registerDomEvent(document, 'click', (evt: MouseEvent) => {
-    //   console.log('click', evt);
-    // });
 
     this.registerEvent(this.app.vault.on('create', (file: TAbstractFile) => {
       console.log('create', file.name);
@@ -47,7 +44,7 @@ export default class MyPlugin extends Plugin implements MyPluginInterface {
     }));
 
     // When registering intervals, this function will automatically clear the interval when the plugin is disabled.
-    this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
+    // this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
   }
 
   onunload() {}
