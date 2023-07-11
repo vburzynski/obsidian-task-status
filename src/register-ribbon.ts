@@ -1,5 +1,6 @@
-import { Notice, addIcon } from 'obsidian';
+import { MarkdownView, addIcon } from 'obsidian';
 import { MyPluginInterface } from "./types";
+import QuickActionModal from './modals/quick-action-modal';
 
 export default (plugin: MyPluginInterface) => {
   // modified version of https://lucide.dev/icons/search-check
@@ -17,9 +18,13 @@ export default (plugin: MyPluginInterface) => {
   // create an icon in the left ribbon.
   const ribbonIconEl: HTMLElement = plugin.addRibbonIcon(
     'search-check',
-    'Sample Plugin',
+    'Checkbox Status Search',
     (evt: MouseEvent) => {
-      new Notice('This is a notice!');
+      const activeView = plugin.app.workspace.getActiveViewOfType(MarkdownView);
+      if (!activeView) return;
+
+      const editor = activeView.editor;
+      new QuickActionModal(plugin.app, plugin, editor).open();
     }
   );
 
