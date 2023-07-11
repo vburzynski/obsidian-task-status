@@ -1,41 +1,7 @@
 import { Command, MarkdownView, Editor, Notice, SuggestModal, FuzzySuggestModal, App } from "obsidian";
 import { MyPluginInterface } from "src/types";
 
-// How is this different from what is available?
-//
-// `obsidian-tasks`
-// - lets you toggle/cycle through a user-configurable pre-determined sequence / state machine
-// - directed acyclic graph / state-machine. single outgoing state transition
-// - more focus on adding metadata to tasks
-//
-// `obsidian-task-collector`
-// - the task marker modal is mouse dependent/driven
-// - focuses on grouping task mechanism a bit
-// - you can add any status, but you have to remember the character you want to not lift your hands from the keyboard
-// - grid layout optimizes for space and cursor movement
-// - scan of options necessitates a Z or F pattern eye movement
-// - not searchable
-//
-// `obsidian-task-marker`
-// - another task marker modal that is mouse dependent/driven
-// - you can add any status, but you have to remember the character you want to not lift your hands from the keyboard
-// - grid layout optimizes for space and cursor movement
-// - scan of options necessitates a Z or F pattern eye movement
-// - not searchable
-//
-// `obsidian-toggle-list`
-// - another way of doing a pre-determined toggle sequence / state machine?
-// - initially complex
-
-// WHY this plugin?
-// ================
-// - keyboard driven - your hands don't need to jump between keys and mouse/trackball/trackpad
-// - ability to indiscriminately jump between any checkbox status
-// - don't have to remember the text characters
-// - add pre-defined sets of status via settings (similar to obsidian-tasks).
-// - quick linear scan through the list of options (as opposed to a grid)
-// - attempt to complement other task related plugins
-
+// TODO: add the ability to select multiple lines
 // TODO: memoize/cache/store the previously used status
 // TODO: create a command to quickly reuse last status
 // TODO: make the accents customizable through the settings
@@ -195,8 +161,6 @@ export class ExampleModal extends SuggestModal<CheckboxOption> {
       textAlign: 'center',
     });
 
-    // const label = el.createEl("label");
-    // label.classList.add('task-list-label');
     const input = el.createEl('input', { attr: { 'type': 'checkbox', 'data-task': option.character } });
     input.classList.add('task-list-item');
     input.checked = option.character !== ' ';

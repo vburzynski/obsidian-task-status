@@ -1,95 +1,35 @@
-# Obsidian Sample Plugin
+# Obsidian Task Quick Menu
 
-This is a sample plugin for Obsidian (https://obsidian.md).
+A plugin to dynamically and indiscriminately change the checkbox markers (aka status, accent, or signifier) on the current line of text. using  `⌘ + Shift + L` on a mac, or `CTRL + Shift + L` on windows, will display a semantically searchable quick menu which displays the available checkbox statuses you have configured.
 
-This project uses Typescript to provide type checking and documentation.
-The repo depends on the latest plugin API (obsidian.d.ts) in Typescript Definition format, which contains TSDoc comments describing what it does.
+## Why this plugin?
 
-**Note:** The Obsidian API is still in early alpha and is subject to change at any time!
+- keyboard driven
+  - there's a focus on keeping your hands on the keyboard
+  - bypass the need for your hands to jump between keys and mouse/trackball/trackpad
+- semantically searchable quick menu
+  - stateless and enables the ability to quickly and indiscriminately jump between any checkbox status
+  - fuzzy finder -- you don't have to remember which text character maps to a task status
+  - presentation enables a quick linear scan through the list of options
+- minimal configuration
+  - add pre-defined sets of status markers via settings
+  - easily customize your own status markers
+- our goal is to complement other task related plugins
 
-This sample plugin demonstrates some of the basic functionality the plugin API can do.
-- Adds a ribbon icon, which shows a Notice when clicked.
-- Adds a command "Open Sample Modal" which opens a Modal.
-- Adds a plugin setting tab to the settings page.
-- Registers a global click event and output 'click' to the console.
-- Registers a global interval which logs 'setInterval' to the console.
+## How is this different from what is available?
 
-## First time developing plugins?
+`obsidian-tasks`
 
-Quick starting guide for new plugin devs:
+My impression is that the main focus of this plugin is on the management and searching of metadata related to tasks. This enables an impressive set of additional functionality to obsidian's built in tasks and checkboxes. You can edit all the tasks' inline metadata via UI modals or popups. Towards checkbox status (markings/accents), however, there's not an easy way to jump to another status. Every status state for a checkbox, the plugin allows you to define the next status that follows when that status is "done". You can create a user-configurable pre-determined state-machine like sequence of statuses represented by an acyclic graph where every single status node has a single output (a single outgoing transition). It supports many different statuses, but to set any of them, you would either have to manually type the marker yourself or configure the plugin so you could loop through your common statuses. This is great when you have a set of independent workflows or a small set of markers to iterate through.
 
-- Check if [someone already developed a plugin for what you want](https://obsidian.md/plugins)! There might be an existing plugin similar enough that you can partner up with.
-- Make a copy of this repo as a template with the "Use this template" button (login to GitHub if you don't see it).
-- Clone your repo to a local development folder. For convenience, you can place this folder in your `.obsidian/plugins/your-plugin-name` folder.
-- Install NodeJS, then run `npm i` in the command line under your repo folder.
-- Run `npm run dev` to compile your plugin from `main.ts` to `main.js`.
-- Make changes to `main.ts` (or create new `.ts` files). Those changes should be automatically compiled into `main.js`.
-- Reload Obsidian to load the new version of your plugin.
-- Enable plugin in settings window.
-- For updates to the Obsidian API run `npm update` in the command line under your repo folder.
+`obsidian-task-collector`
 
-## Releasing new releases
+The unique aspect of this plugin seems to be the collection mechanism. You can setup a workflow that, when you trigger the collection action, moves tasks to another heading group in the document. You could even configure a workflow where tasks have some simple transformations applied when getting collected into a group. There is a popup modal to select a task marker, but you only see the marker and the character used inside the checkbox. You don't see the semantic status names that the markings signify. The modal isn't searchable, though you can type the character you want to have appear in the checkbox. Scanning through the grid layout on the modal requires Z/F or S pattern eye movements. The layout is nicely optimized for mouse interaction as the options are clustered into a tight grouping.
 
-- Update your `manifest.json` with your new version number, such as `1.0.1`, and the minimum Obsidian version required for your latest release.
-- Update your `versions.json` file with `"new-plugin-version": "minimum-obsidian-version"` so older versions of Obsidian can download an older version of your plugin that's compatible.
-- Create new GitHub release using your new version number as the "Tag version". Use the exact version number, don't include a prefix `v`. See here for an example: https://github.com/obsidianmd/obsidian-sample-plugin/releases
-- Upload the files `manifest.json`, `main.js`, `styles.css` as binary attachments. Note: The manifest.json file must be in two places, first the root path of your repository and also in the release.
-- Publish the release.
+`obsidian-task-marker`
 
-> You can simplify the version bump process by running `npm version patch`, `npm version minor` or `npm version major` after updating `minAppVersion` manually in `manifest.json`.
-> The command will bump version in `manifest.json` and `package.json`, and add the entry for the new version to `versions.json`
+The modal provided by this plugin seemed pretty similar to the one in `obsidian-task-collector` with some additional commands to mark the tasks in the current document
 
-## Adding your plugin to the community plugin list
+`obsidian-toggle-list`
 
-- Check https://github.com/obsidianmd/obsidian-releases/blob/master/plugin-review.md
-- Publish an initial version.
-- Make sure you have a `README.md` file in the root of your repo.
-- Make a pull request at https://github.com/obsidianmd/obsidian-releases to add your plugin.
-
-## How to use
-
-- Clone this repo.
-- `npm i` or `yarn` to install dependencies
-- `npm run dev` to start compilation in watch mode.
-
-## Manually installing the plugin
-
-- Copy over `main.js`, `styles.css`, `manifest.json` to your vault `VaultFolder/.obsidian/plugins/your-plugin-id/`.
-
-## Improve code quality with eslint (optional)
-- [ESLint](https://eslint.org/) is a tool that analyzes your code to quickly find problems. You can run ESLint against your plugin to find common bugs and ways to improve your code. 
-- To use eslint with this project, make sure to install eslint from terminal:
-  - `npm install -g eslint`
-- To use eslint to analyze this project use this command:
-  - `eslint main.ts`
-  - eslint will then create a report with suggestions for code improvement by file and line number.
-- If your source code is in a folder, such as `src`, you can use eslint with this command to analyze all files in that folder:
-  - `eslint .\src\`
-
-## Funding URL
-
-You can include funding URLs where people who use your plugin can financially support it.
-
-The simple way is to set the `fundingUrl` field to your link in your `manifest.json` file:
-
-```json
-{
-    "fundingUrl": "https://buymeacoffee.com"
-}
-```
-
-If you have multiple URLs, you can also do:
-
-```json
-{
-    "fundingUrl": {
-        "Buy Me a Coffee": "https://buymeacoffee.com",
-        "GitHub Sponsor": "https://github.com/sponsors",
-        "Patreon": "https://www.patreon.com/"
-    }
-}
-```
-
-## API Documentation
-
-See https://github.com/obsidianmd/obsidian-api
+This also has some mechanisms for adding custom markings and metadata to tasks, but I've admittedly not dug too deep into what's there. Towards the status markers, you can create different state groups and there are mechanisms to cycle through the states in the groups.
