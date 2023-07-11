@@ -10,10 +10,9 @@ export default class Settings extends PluginSettingTab {
   }
 
   display(): void {
-    const {containerEl} = this;
+    const { containerEl } = this;
 
     containerEl.empty();
-
     containerEl.createEl('h2', {text: 'Settings for my awesome plugin.'});
 
     new Setting(containerEl)

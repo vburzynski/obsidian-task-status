@@ -17,6 +17,7 @@ export default class MyPlugin extends Plugin implements MyPluginInterface {
 
   async onload() {
     await this.loadSettings();
+
     registerRibbon(this);
 
     this.addCommand(openSampleModalSimple(this));
