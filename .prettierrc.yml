@@ -1,0 +1,41 @@
+---
+endOfLine: lf
+
+# Specify the line length that the printer will wrap on.
+printWidth: 120
+
+# Use single quotes instead of double quotes in JSX.
+singleQuote: true
+
+# Specify the number of spaces per indentation-level.
+tabWidth: 2
+
+# Indent lines with tabs instead of spaces.
+useTabs: false
+
+# Enforce single attribute per line in HTML, Vue and JSX.
+# - false - Do not enforce single attribute per line.
+# - true - Enforce single attribute per line.
+singleAttributePerLine: false
+
+# Do not print semicolons, except at the beginning of lines which may need them.
+# - true - add a semicolon at the end of every line
+# - false - only add semicolons at the beginning of lines that may introduce ASI failures
+semi: true
+
+# Print trailing commas wherever possible.
+# - "none" - no trailing commas
+# - "es5" - trailing commas where valid in ES5 (objects, arrays, etc)
+# - "all" - trailing commas wherever possible (function arguments)
+trailingComma: es5
+
+# Do not print spaces between brackets.
+# If true, puts the > of a multi-line jsx element at the end of the last line instead of being
+# alone on the next line
+bracketSameLine: false
+
+# different configuration for certain file patterns
+overrides:
+  - files: "*.scss"
+    options:
+      singleQuote: false
