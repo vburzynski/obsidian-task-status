@@ -20,6 +20,10 @@
   - [ ] command to toggle between no marker and last used marker
   - [ ] command for each type of checkbox accent;
 
+## Bug Fixes
+
+- [ ] making a multi-line selection in reverse (down to up), doesn't work
+
 ## Other Ideas
 
 - [ ] ability to quickly make a checkbox into a non-checkbox. (would this become a list item or regular text?)
