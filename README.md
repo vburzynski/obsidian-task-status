@@ -33,3 +33,14 @@ The modal provided by this plugin seemed pretty similar to the one in `obsidian-
 `obsidian-toggle-list`
 
 This also has some mechanisms for adding custom markings and metadata to tasks, but I've admittedly not dug too deep into what's there. Towards the status markers, you can create different state groups and there are mechanisms to cycle through the states in the groups.
+
+## Current Limitations
+
+- Headings
+- Code Blocks
+  - Any part of a code block that is selected will have the task markers appended to the front
+- Obsidian Callouts
+  - While you can select content within a callout (or block quote), the plugin does not yet ignore the starting line of the callout (the line that contains the callout type `[!info]` and title)
+- Obsidian Comments
+  - The plugin doesn't yet ignore these lines either
+  - If a comment is part of your selection range, those lines will also have the checkbox marker appended to the front of the line.
