@@ -1,6 +1,9 @@
 import { Editor, EditorSelection } from "obsidian";
 
+// TODO: on single-line selections, should headings be transformed into tasks? (strip out heading)?
+// TODO: ignore certain types of blocks -- like comment blocks and code blocks
 class SwapCheckboxStatus {
+  // reference to the obsidian Editor
   editor: Editor;
 
   // matches a checklist item:
@@ -12,81 +15,115 @@ class SwapCheckboxStatus {
   public static readonly taskRegex = /^([\s>]*[-*]\s)\[[^\]]\]?(.*)$/gm;
 
   // matches a line that is not a checklist
-  // negative lookahead - ignore headings
-  // negative lookahead - make sure line isn't blank
-  // 1st capturing group
-  // - match any amount of indentation or whitespace, and blockquote markers
-  // 2nd capturing group
+  // The description below may need an update
+  // negative lookahead 1 - ignore headings
+  // negative lookahead 2 - make sure line isn't blank
+  // negative lookahead 3 - make sure line isn't a hozontal rule / thematic break
+  // capturing group 1
+  // - throw away (used for the negative lookaheads)
+  // capturing group 2
+  // - match any amount of indentation or whitespace, and also blockquote markers
+  // capturing group 3
   // - optional unordered list marker (dash or asterix), or ordered list marker
-  // 3rd capturing group
+  // capturing group 4
   // - matches content of length 0..n
   // - includes a negative lookahead to ensure this isn't a task already
   // - uses a non-capturing group to encapsulate the negative lookahead with the any character operator
-  public static readonly nonTaskRegex = /(?!^#+)(?!^\s*$)^([\s>]*)((?:[-*]|[0-9]+\.)\s)?((?:(?!\[[^\]]\].*).)*)$/gm
-
-  // TODO: on single-line selections, should headings be transformed into tasks? (strip out heading)?
-  // TODO: if the start of a selection isn't the start of the line, extend it?
-  // TODO: ignore certain types of blocks -- like comment blocks and code blocks
-
-  // QUESTION: Is it better to process line by line, or do selections?
-
+  // public static readonly nonTaskRegex = /(?!^#+)(?!^\s*$)^([\s>]*)((?:[-*]|[0-9]+\.)\s)?((?:(?!\[[^\]]\].*).)*)$/gm
+  // public static readonly nonTaskRegex = /(?!^#+)(?!^\s*$)(?!^(?:---|***)$)^([\s>]*)((?:[-*+]|[0-9]+\.)\s)?((?:(?!\[[^\]]\].*|\[![\w-]+\].*).)*)$/gm
+  public static readonly nonTaskRegex = /(?!^#+)(?!^\s*$)(?!^\s{0,3}([-_*]) *(?:\1 *){2,}$)(?!^[\s>]* \[![\w-]+\])^([\s>]*)(?:(?!(?:\s*>?)*\s*[-*+]\s+\[[^\]]\])((?:[-*+]|[0-9]+\.)\s)?(.*))/gm
 
   // matches a blank line
-  public static readonly blankLineRegex = /^\s*$/gm;
+  public static readonly blankLineRegex = /^(\s*)$/gm;
 
   constructor(editor: Editor) {
     this.editor = editor;
-
   }
 
-  swap(target: string) {
+  /**
+   * Initiates the transformation of editor selected lines
+   * @param marker the status marker string to put inside the checkbox
+   */
+  swap(marker: string) {
     const selections = this.editor.listSelections();
     selections.forEach((selection) => {
-      this.toggleSelectionOrLine(selection, target)
+      this.transformSelectionOrLine(selection, marker)
     });
   }
 
-  toggleSelectionOrLine(selection: EditorSelection, target: string) {
+  /**
+   * execute the appropriate transform depending on whether a single line or multiple are selected
+   * @param selection an editor selection
+   * @param marker the status marker to put inside the checkbox
+   */
+  transformSelectionOrLine(selection: EditorSelection, marker: string) {
+    console.log('selection', selection);
     if ((selection.anchor.line === selection.head.line) && (selection.anchor.ch === selection.head.ch)) {
-      this.toggleLine(selection.anchor.line, target);
+      this.transformLine(selection.anchor.line, marker);
     } else {
-      this.toggleSelection(target);
+      this.transformSelection(selection, marker);
     }
   }
 
-  toggleLine(line: number, target: string) {
+  /**
+   * transform a single line by it's line number
+   * @param line the line number
+   * @param target the status marker to put inside the checkbox
+   */
+  transformLine(line: number, target: string) {
     const original = this.editor.getLine(line);
     let replacement = original;
+
     if (SwapCheckboxStatus.taskRegex.test(original)) {
+      // when the line is a task...
       replacement = original.replace(SwapCheckboxStatus.taskRegex, `$1[${target}]$2`);
     } else if (SwapCheckboxStatus.nonTaskRegex.test(original)) {
+      // when the line is not a task...
       replacement = original.replace(SwapCheckboxStatus.nonTaskRegex, `$1- [${target}] $3`);
+    } else if (SwapCheckboxStatus.blankLineRegex.test(original)) {
+      // when the line is blank...
+      replacement = original.replace(SwapCheckboxStatus.blankLineRegex, `$1- [${target}] `);
     }
     this.editor.setLine(line, replacement);
+
+    // TODO: make this configurable in the settings (jump to end of line)
+    // TODO: retain jumping to the end of the line when it is blank
+    // FIXME: this only retains the final cursor selection, nothing else; maybe use `setSelections`
+    this.editor.setSelection({ line, ch: replacement.length });
   }
 
-  toggleSelection(target: string) {
-    const cursorStart = this.editor.getCursor("from");
-    cursorStart.ch = 0;
+  /**
+   * transform a selection of text
+   * @param selection
+   * @param target
+   */
+  transformSelection(selection: EditorSelection, target: string) {
+    const { anchor, head } = selection;
 
-    const cursorEnd = this.editor.getCursor("to");
+    // determine the start and end
+    const anchorIsStart = anchor.ch <= head.ch && anchor.line <= head.line;
+    const cursorStart = (anchorIsStart) ? anchor : head;
+    const cursorEnd = (anchorIsStart) ? head : anchor;
+
+    // expand the selection to cover entire lines
+    cursorStart.ch = 0;
     cursorEnd.ch = 0;
     cursorEnd.line += 1;
 
-    const original = this.editor.getRange(cursorStart, cursorEnd);
-    let replacement = original;
+    // get the existing original text
+    let replacement = this.editor.getRange(cursorStart, cursorEnd);
 
-    // first replace all the current task lines
-    if (SwapCheckboxStatus.taskRegex.test(original)) {
-      replacement = original.replace(SwapCheckboxStatus.taskRegex, `$1[${target}]$2`);
-      this.editor.replaceRange(replacement, cursorStart, cursorEnd);
+    // replace all the current task lines
+    if (SwapCheckboxStatus.taskRegex.test(replacement)) {
+      replacement = replacement.replace(SwapCheckboxStatus.taskRegex, `$1[${target}]$2`);
     }
 
-    // next, any non blank lines that are selected are transformed into tasks as well
-    if (SwapCheckboxStatus.nonTaskRegex.test(original)) {
-      replacement = original.replace(SwapCheckboxStatus.nonTaskRegex, `$1- [${target}] $3`);
-      this.editor.replaceRange(replacement, cursorStart, cursorEnd);
+    // all selected non-blank lines are transformed into tasks as well
+    if (SwapCheckboxStatus.nonTaskRegex.test(replacement)) {
+      replacement = replacement.replace(SwapCheckboxStatus.nonTaskRegex, `$2- [${target}] $4`);
     }
+
+    this.editor.replaceRange(replacement, cursorStart, cursorEnd);
   }
 }
 

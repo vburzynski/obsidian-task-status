@@ -8,6 +8,9 @@ import DEFAULT_SETTINGS from 'src/default-settings';
 export default class MyPlugin extends Plugin implements MyPluginInterface {
   settings: MyPluginSettings;
 
+  /**
+   * Setup the plugin when it loads in obsidian
+   */
   async onload() {
     await this.loadSettings();
     registerRibbon(this);
@@ -15,12 +18,21 @@ export default class MyPlugin extends Plugin implements MyPluginInterface {
     this.addSettingTab(new Settings(this.app, this));
   }
 
+  /**
+   * Teardown the plugin when it gets unloaded
+   */
   onunload() {}
 
+  /**
+   * Trigger the rendering of the settings view
+   */
   async loadSettings() {
     this.settings = Object.assign({}, DEFAULT_SETTINGS, await this.loadData());
   }
 
+  /**
+   * persist/save the plugin settings
+   */
   async saveSettings() {
     await this.saveData(this.settings);
   }

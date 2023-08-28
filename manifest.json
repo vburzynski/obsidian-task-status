@@ -1,10 +1,10 @@
 {
-	"id": "obsidian-plugin",
-	"name": "Test Plugin",
+	"id": "obsidian-task-status-quick-menu",
+	"name": "Task Status Quick Menu",
 	"version": "1.0.0",
 	"minAppVersion": "0.15.0",
-	"description": "Testing Plugin Development",
+	"description": "A Quick Menu to select and apply a custom task status marker",
 	"author": "Valerie Burzynski",
-	"authorUrl": "https://obsidian.md",
+	"authorUrl": "https://github.com/vburzynski/",
 	"isDesktopOnly": false
 }
