@@ -1,6 +1,6 @@
-import { MyPluginSettings } from './types';
+import { TaskStatusPluginSettings } from './types';
 
-const DEFAULT_SETTINGS: MyPluginSettings = {
+const DEFAULT_SETTINGS: TaskStatusPluginSettings = {
   mySetting: 'default',
 
   // prettier-ignore

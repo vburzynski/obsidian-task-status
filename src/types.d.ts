@@ -1,16 +1,16 @@
 import { Command, Plugin } from "obsidian";
 
 interface CommandCreator {
-  (plugin: MyPluginInterface): Command;
+  (plugin: TaskStatusPluginInterface): Command;
 }
 
-interface MyPluginSettings {
+interface TaskStatusPluginSettings {
   mySetting: string;
   checkboxOptions: CheckboxOption[],
 }
 
-interface MyPluginInterface extends Plugin {
-  settings: MyPluginSettings;
+interface TaskStatusPluginInterface extends Plugin {
+  settings: TaskStatusPluginSettings;
   loadSettings(): Promise<void>;
   saveSettings(): Promise<void>;
 }

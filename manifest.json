@@ -1,7 +1,7 @@
 {
-	"id": "obsidian-task-status-quick-menu",
-	"name": "Task Status Quick Menu",
-	"version": "1.0.0",
+	"id": "obsidian-task-status",
+	"name": "Task Status",
+	"version": "1.0.1",
 	"minAppVersion": "0.15.0",
 	"description": "A Quick Menu to select and apply a custom task status marker",
 	"author": "Valerie Burzynski",

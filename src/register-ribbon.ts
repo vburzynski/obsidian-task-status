@@ -1,11 +1,11 @@
 import { MarkdownView, addIcon } from 'obsidian';
-import { MyPluginInterface } from "./types";
+import { TaskStatusPluginInterface } from "./types";
 import QuickActionModal from './modals/quick-action-modal';
 
 /**
  * Registers a Ribbon Icon that can open the action modal
  */
-export default (plugin: MyPluginInterface) => {
+export default (plugin: TaskStatusPluginInterface) => {
   // Add an icon (modified version of https://lucide.dev/icons/search-check)
   addIcon(
     'search-check',

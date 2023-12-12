@@ -1,6 +1,6 @@
 {
-	"name": "obsidian-task-status-quick-menu",
-	"version": "1.0.0",
+	"name": "obsidian-task-status",
+	"version": "1.0.1",
 	"description": "Quickly change any task status in your Obsidian notes",
 	"main": "main.js",
 	"scripts": {

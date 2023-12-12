@@ -1,6 +1,6 @@
-# Obsidian Task Status Quick Menu
+# Obsidian Task Status
 
-Quickly change any task status in your notes. The searchable modal enables a more dynamic and indiscriminate workflow when you need to change your checkbox markers.
+Quickly change any task status in your Obsidian notes. The searchable modal enables a more dynamic and indiscriminate workflow when you need to change your checkbox markers.
 
 ![A demonstration of the plugin](assets/demo.gif)
 

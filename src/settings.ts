@@ -1,5 +1,5 @@
 import { App, PluginSettingTab, Setting } from 'obsidian';
-import { MyPluginInterface } from './types';
+import { TaskStatusPluginInterface } from './types';
 
 /**
  * Swap two indexes in an array
@@ -27,14 +27,14 @@ function moveToTop<T>(arr: T[], index: number): void {
 }
 
 export default class Settings extends PluginSettingTab {
-  plugin: MyPluginInterface;
+  plugin: TaskStatusPluginInterface;
 
   /**
    * constructs the settings
    * @param app obsidian application instance
    * @param plugin plugin instance
    */
-  constructor(app: App, plugin: MyPluginInterface) {
+  constructor(app: App, plugin: TaskStatusPluginInterface) {
     super(app, plugin);
     this.plugin = plugin;
   }

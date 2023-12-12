@@ -1,5 +1,5 @@
 import { Command, MarkdownView, Editor } from "obsidian";
-import { MyPluginInterface } from "src/types";
+import { TaskStatusPluginInterface } from "src/types";
 import QuickActionModal from '../modals/quick-action-modal';
 
 /**
@@ -7,7 +7,7 @@ import QuickActionModal from '../modals/quick-action-modal';
  * @param plugin the plugin instance
  * @returns a command object
  */
-const openTaskQuickMenu = (plugin: MyPluginInterface): Command => ({
+const openTaskQuickMenu = (plugin: TaskStatusPluginInterface): Command => ({
   id: 'open-task-quick-menu',
   name: 'open task quick menu',
   hotkeys: [{ modifiers: ["Mod", "Shift"], key: "l" }],

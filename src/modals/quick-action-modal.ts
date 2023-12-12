@@ -1,13 +1,13 @@
 import { Editor, Notice, SuggestModal, App } from "obsidian";
 import SwapCheckboxStatus from "src/swap-checkbox-status";
-import { CheckboxOption, MyPluginInterface } from "src/types";
+import { CheckboxOption, TaskStatusPluginInterface } from "src/types";
 
 /**
  * A serchable modal that allows the user to select a checkbox status symbol
  */
 export default class QuickActionModal extends SuggestModal<CheckboxOption> {
   editor: Editor;
-  plugin: MyPluginInterface;
+  plugin: TaskStatusPluginInterface;
 
   /**
    *
@@ -15,7 +15,7 @@ export default class QuickActionModal extends SuggestModal<CheckboxOption> {
    * @param plugin plugin instance
    * @param editor editor instance
    */
-  constructor(app: App, plugin: MyPluginInterface, editor: Editor) {
+  constructor(app: App, plugin: TaskStatusPluginInterface, editor: Editor) {
     super(app);
     this.plugin = plugin;
     this.editor = editor;

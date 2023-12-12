@@ -1,12 +1,12 @@
 import { Plugin } from 'obsidian';
-import { MyPluginInterface, MyPluginSettings } from 'src/types';
+import { TaskStatusPluginInterface, TaskStatusPluginSettings } from 'src/types';
 import Settings from 'src/settings';
 import registerRibbon from 'src/register-ribbon';
 import openTaskQuickMenu from 'src/commands/open-task-quick-menu';
 import DEFAULT_SETTINGS from 'src/default-settings';
 
-export default class MyPlugin extends Plugin implements MyPluginInterface {
-  settings: MyPluginSettings;
+export default class TaskStatusPlugin extends Plugin implements TaskStatusPluginInterface {
+  settings: TaskStatusPluginSettings;
 
   /**
    * Setup the plugin when it loads in obsidian
