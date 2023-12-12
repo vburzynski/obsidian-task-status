@@ -61,3 +61,7 @@ Minimal), or that you've created and applied your own CSS snippet to style tasks
 - **Obsidian Comments**
   - If a comment is part of your selection range, those lines will also have the checkbox marker appended to the front of the line (as if they were just text content and not a comment).
   - For now, avoid selecting comments
+
+## Contributing
+
+- please follow [conventional commit guidelines](https://www.conventionalcommits.org/)
