@@ -123,7 +123,7 @@ class SwapCheckboxStatus {
 
     // all selected non-blank lines are transformed into tasks as well
     if (SwapCheckboxStatus.nonTaskRegex.test(replacement)) {
-      replacement = replacement.replace(SwapCheckboxStatus.nonTaskRegex, `$2- [${target}] $4`);
+      replacement = replacement.replace(SwapCheckboxStatus.nonTaskRegex, `$2- [${target}] $3`);
     }
 
     this.editor.replaceRange(replacement, cursorStart, cursorEnd);
