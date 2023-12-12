@@ -5,11 +5,20 @@
   - [x] support multiple selections
 - [x] Functionality
   - [x] on a non-checkbox lines, add the checkbox markup with the selected character marking
-- [x] Test on mac
-- [ ] Test on mobile (iOS)
-- [ ] Test on windows
-- [ ] Test on linux
-- [ ] Other Plugins Use Mod+Shift+L, should I use an alternative? (search for `key:\s+['"]l['"]`)
+- [ ] Testing
+  - [x] Test on mac
+  - [ ] Test on mobile (iOS)
+  - [ ] Test on windows
+  - [ ] Test on linux
+- [x] Review the README
+- [ ] check the `manifest.json`
+- [ ] check the semantic versioning
+- [ ] follow the obsidian guide to release the plugin
+  - [x] create repository on GitHub
+  - [ ] create a release
+  - [ ] submit plugin for review
+  - [ ] address review comments
+- [ ] Pick out a License
 - [ ] Figure out the workflow and steps needed to submit plugin officially
 
 ## Future Roadmap
