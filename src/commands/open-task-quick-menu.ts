@@ -2,7 +2,12 @@ import { Command, MarkdownView, Editor } from "obsidian";
 import { MyPluginInterface } from "src/types";
 import QuickActionModal from '../modals/quick-action-modal';
 
-export default (plugin: MyPluginInterface): Command => ({
+/**
+ * command creator which constructs a command object configured to open the quick action modal
+ * @param plugin the plugin instance
+ * @returns a command object
+ */
+const openTaskQuickMenu = (plugin: MyPluginInterface): Command => ({
   id: 'open-task-quick-menu',
   name: 'open task quick menu',
   hotkeys: [{ modifiers: ["Mod", "Shift"], key: "l" }],
@@ -11,4 +16,5 @@ export default (plugin: MyPluginInterface): Command => ({
   }
 });
 
+export default openTaskQuickMenu;
 

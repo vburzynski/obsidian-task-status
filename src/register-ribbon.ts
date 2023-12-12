@@ -2,8 +2,11 @@ import { MarkdownView, addIcon } from 'obsidian';
 import { MyPluginInterface } from "./types";
 import QuickActionModal from './modals/quick-action-modal';
 
+/**
+ * Registers a Ribbon Icon that can open the action modal
+ */
 export default (plugin: MyPluginInterface) => {
-  // modified version of https://lucide.dev/icons/search-check
+  // Add an icon (modified version of https://lucide.dev/icons/search-check)
   addIcon(
     'search-check',
     `<g stroke="none" stroke-width="1" fill="none" fill-rule="evenodd" stroke-linecap="round" stroke-linejoin="round">
@@ -16,10 +19,10 @@ export default (plugin: MyPluginInterface) => {
   );
 
   // create an icon in the left ribbon.
-  const ribbonIconEl: HTMLElement = plugin.addRibbonIcon(
+  plugin.addRibbonIcon(
     'search-check',
     'Checkbox Status Search',
-    (evt: MouseEvent) => {
+    (_event: MouseEvent) => {
       const activeView = plugin.app.workspace.getActiveViewOfType(MarkdownView);
       if (!activeView) return;
 
@@ -27,6 +30,4 @@ export default (plugin: MyPluginInterface) => {
       new QuickActionModal(plugin.app, plugin, editor).open();
     }
   );
-
-  ribbonIconEl.addClass('my-plugin-ribbon-class');
 }

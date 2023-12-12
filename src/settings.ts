@@ -29,28 +29,22 @@ function moveToTop<T>(arr: T[], index: number): void {
 export default class Settings extends PluginSettingTab {
   plugin: MyPluginInterface;
 
+  /**
+   * constructs the settings
+   * @param app obsidian application instance
+   * @param plugin plugin instance
+   */
   constructor(app: App, plugin: MyPluginInterface) {
     super(app, plugin);
     this.plugin = plugin;
   }
 
   /**
-   * Render (display) the settings view
+   * Renders the settings view
    */
   display(): void {
     const { containerEl } = this;
     containerEl.empty();
-    // containerEl.createEl('h2', { text: 'Settings for the Task Status Quick Menu' });
-
-    // const taskLine = containerEl.createEl('div')
-    // taskLine.addClasses(['HyperMD-list-line', 'HyperMD-list-line-1', 'HyperMD-task-line', 'cm-line']);
-    // const taskLabel = taskLine.createEl('label')
-    // taskLabel.addClass('task-list-label');
-    // const taskInput = taskLabel.createEl('input', { type: 'checkbox', attr: { 'data-task': ' ', disabled: true } });
-    // taskInput.addClass('task-list-item-checkbox');
-    // const taskSpan = taskLine.createEl('span', { text: 'task item' });
-    // taskSpan.addClass('cm-list-1');
-
     this.displayTaskStatuses();
   }
 
@@ -65,9 +59,7 @@ export default class Settings extends PluginSettingTab {
     // item or remove it
     this.plugin.settings.checkboxOptions.forEach((checkboxOption, index) => {
       new Setting(this.containerEl)
-        .setName(`${index + 1}.`)
-        // .setName(checkboxOption.title)
-        // .setDesc(`- [${checkboxOption.character}]`)
+        .setName(`${(index + 1).toString().padStart(2, '0')}.`)
         .addText(async (text) => {
           text
             .setPlaceholder('name')
