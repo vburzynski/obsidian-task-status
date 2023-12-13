@@ -21,7 +21,7 @@ export default (plugin: TaskStatusPluginInterface) => {
   // create an icon in the left ribbon.
   plugin.addRibbonIcon(
     'search-check',
-    'Checkbox Status Search',
+    'Change Checkbox Status',
     (_event: MouseEvent) => {
       const activeView = plugin.app.workspace.getActiveViewOfType(MarkdownView);
       if (!activeView) return;

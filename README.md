@@ -6,15 +6,16 @@ Quickly change any task status in your Obsidian notes. The searchable modal enab
 
 ## Instructions
 
-Select one or more lines of text using cursors or a selection range. Then use `⌘ + Shift + L` on a
-mac, or `CTRL + Shift + L` on windows, to display a semantically searchable quick menu to navigate
+Select one or more lines of text using cursors or a selection range. Then open the command palette and select the
+`Task Status: change task status` command to display a semantically searchable quick menu to navigate
 and apply one of several custom task status markers. Applying a task status marker will both swap
 existing task markers and transform non-task content into tasks. The custom statues are configurable
-and customizable through the plugin settings. 
+and customizable through the plugin settings. If you'd like to set a hotkey, you might use `⌘ + Shift + L` on a
+mac, or `CTRL + Shift + L` on Windows. I find this pairs well with the hotkey for "Toggle Checkbox Status".
 
-Please note, that this plugin assumes that you have
-either installed an Obsidian theme which includes custom task status styling (such as Things or
-Minimal), or that you've created and applied your own CSS snippet to style tasks.
+Please note, that this plugin assumes that you have either installed an Obsidian theme which includes
+custom task status styling (such as Things or Minimal), or that you've created and applied your own
+CSS snippet to style tasks.
 
 ## Why this plugin?
 

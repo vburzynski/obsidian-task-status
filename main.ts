@@ -2,7 +2,7 @@ import { Plugin } from 'obsidian';
 import { TaskStatusPluginInterface, TaskStatusPluginSettings } from 'src/types';
 import Settings from 'src/settings';
 import registerRibbon from 'src/register-ribbon';
-import openTaskQuickMenu from 'src/commands/open-task-quick-menu';
+import changeTaskStatus from 'src/commands/open-task-quick-menu';
 import DEFAULT_SETTINGS from 'src/default-settings';
 
 export default class TaskStatusPlugin extends Plugin implements TaskStatusPluginInterface {
@@ -14,7 +14,7 @@ export default class TaskStatusPlugin extends Plugin implements TaskStatusPlugin
   async onload() {
     await this.loadSettings();
     registerRibbon(this);
-    this.addCommand(openTaskQuickMenu(this));
+    this.addCommand(changeTaskStatus(this));
     this.addSettingTab(new Settings(this.app, this));
   }
 

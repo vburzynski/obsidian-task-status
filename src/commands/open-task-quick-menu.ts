@@ -7,14 +7,14 @@ import QuickActionModal from '../modals/quick-action-modal';
  * @param plugin the plugin instance
  * @returns a command object
  */
-const openTaskQuickMenu = (plugin: TaskStatusPluginInterface): Command => ({
-  id: 'open-task-quick-menu',
-  name: 'open task quick menu',
-  hotkeys: [{ modifiers: ["Mod", "Shift"], key: "l" }],
+const changeTaskStatus = (plugin: TaskStatusPluginInterface): Command => ({
+  id: 'change-task-status',
+  name: 'change task status',
+  // hotkeys: [{ modifiers: ["Mod", "Shift"], key: "l" }],
   editorCallback: (editor: Editor, view: MarkdownView) => {
     new QuickActionModal(plugin.app, plugin, editor).open();
   }
 });
 
-export default openTaskQuickMenu;
+export default changeTaskStatus;
 
