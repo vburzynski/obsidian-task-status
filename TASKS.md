@@ -98,3 +98,10 @@ Scenario: end of selection intersects with a callout block
 - [ ] ability to quickly make a checkbox into a non-checkbox.
   - would this become a list item or regular text? (probably an unordered list item)
 
+## Release Workflow
+
+```shell
+git tag -a 1.0.4 -m "1.0.4"
+git push origin 1.0.4
+gh release create "1.0.4" --title="1.0.4" --draft main.js manifest.json styles.css
+```
