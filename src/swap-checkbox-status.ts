@@ -3,10 +3,12 @@ import { Editor, EditorSelection } from 'obsidian';
 // TODO: ignore certain types of blocks -- like comment blocks and code blocks
 
 class SwapCheckboxStatus {
-  // reference to the obsidian Editor
   editor: Editor;
 
-  DEBUG = true;
+  /**
+   * When true, the class will output debug console messages
+   */
+  DEBUG = false;
 
   // matches a checklist item:
   // start of a line; any amount of whitespace or `>` characters (for callouts);
@@ -83,7 +85,6 @@ class SwapCheckboxStatus {
     // TODO: retain jumping to the end of the line when it is blank
     // TODO: this only retains the final cursor selection, nothing else; maybe use `setSelections`
     this.editor.setSelection({ line, ch: replacement.length });
-    this.log('┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉');
   }
 
   getLineReplacement(original: string, target: string): string {
@@ -145,9 +146,12 @@ class SwapCheckboxStatus {
 
     this.log('replacement', replacement);
     this.editor.replaceRange(replacement, cursorStart, cursorEnd);
-    this.log('┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉');
   }
 
+  /**
+   * conditional log output
+   * @param args arguments to pass on to console.log
+   */
   log(...args: unknown[]) {
     this.DEBUG && console.log(...args);
   }
