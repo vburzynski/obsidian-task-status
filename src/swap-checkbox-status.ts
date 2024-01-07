@@ -1,4 +1,4 @@
-import { Editor, EditorSelection } from "obsidian";
+import { Editor, EditorSelection } from 'obsidian';
 
 // TODO: ignore certain types of blocks -- like comment blocks and code blocks
 
@@ -6,13 +6,15 @@ class SwapCheckboxStatus {
   // reference to the obsidian Editor
   editor: Editor;
 
+  DEBUG = true;
+
   // matches a checklist item:
   // start of a line; any amount of whitespace or `>` characters (for callouts);
   // then a dash or asterix for a bullet point, a single whitespace, then square bracket syntax
   // for the checkbox; followed by any remaining characters til the end of the line.
   // 1st capturing group = everything before the checkbox
   // 2nd capturing group = everything after the checkbox
-  public static readonly taskRegex = /^([\s>]*[-*]\s)\[[^\]]\]?(.*)$/gm;
+  public static readonly taskRegex = /^([\s>]*[-*]\s)\[[^\]]\](?!\()(.*)$/gm;
 
   /*
   (?!^#+)                                   Ignore Heading (negative lookahead)
@@ -20,14 +22,15 @@ class SwapCheckboxStatus {
   (?!^\s{0,3}([-_*]) *(?:\1 *){2,}$)        Ignore horizontal rules and thematic breaks
   (?!^[\s>]* \[![\w-]+\])                   Ignore first line of Obsidian Callouts
   ^                                         start of a line
-  (?!(?:\s*>?)*\s*[-*+]\s+\[[^\]]\])        Ignore lines that are tasks (they may or may not be inside block quotes)
+  (?!(?:\s*>?)*\s*[-*+]\s+\[[^\]]\](?!\())  Ignore lines that are tasks (they may or may not be inside block quotes)
   ([>\s]*)?                                 capture any amount of indentation and nested blockquote markers
   (?:(?:[-*+]|[0-9]+\.)\s)?                 don't capture any ordered or unordered list markings
   (.*)                                      capture the rest of the text
   */
 
   // matches a line that is not a checklist
-  public static readonly nonTaskRegex = /(?!^#+)(?!^\s*$)(?!^\s{0,3}([-_*])\s*(?:\1 *){2,}$)(?!^[\s>]* \[![\w-]+\])^(?!(?:\s*>?)*\s*[-*+]\s+\[[^\]]\])([>\s]*)?(?:(?:[-*+]|[0-9]+\.)\s)?(.*)/gm
+  public static readonly nonTaskRegex =
+    /(?!^#+)(?!^\s*$)(?!^\s{0,3}([-_*])\s*(?:\1 *){2,}$)(?!^[\s>]* \[![\w-]+\])^(?!(?:\s*>?)*\s*[-*+]\s+\[[^\]]\](?!\())([>\s]*)?(?:(?:[-*+]|[0-9]+\.)\s)?(.*)/gm;
 
   // matches a blank line
   public static readonly blankLineRegex = /^(\s*)$/gm;
@@ -43,7 +46,7 @@ class SwapCheckboxStatus {
   swap(marker: string) {
     const selections = this.editor.listSelections();
     selections.forEach((selection) => {
-      this.transformSelectionOrLine(selection, marker)
+      this.transformSelectionOrLine(selection, marker);
     });
   }
 
@@ -53,8 +56,8 @@ class SwapCheckboxStatus {
    * @param marker the status marker to put inside the checkbox
    */
   transformSelectionOrLine(selection: EditorSelection, marker: string) {
-    console.log('selection', selection);
-    if ((selection.anchor.line === selection.head.line) && (selection.anchor.ch === selection.head.ch)) {
+    this.log('selection', selection);
+    if (selection.anchor.line === selection.head.line && selection.anchor.ch === selection.head.ch) {
       this.transformLine(selection.anchor.line, marker);
     } else {
       this.transformSelection(selection, marker);
@@ -67,8 +70,12 @@ class SwapCheckboxStatus {
    * @param target the status marker to put inside the checkbox
    */
   transformLine(line: number, target: string) {
+    this.log('start transformLine');
     const original = this.editor.getLine(line);
     const replacement = this.getLineReplacement(original, target);
+
+    this.log('original', original);
+    this.log('replacement', replacement);
 
     this.editor.setLine(line, replacement);
 
@@ -76,22 +83,27 @@ class SwapCheckboxStatus {
     // TODO: retain jumping to the end of the line when it is blank
     // TODO: this only retains the final cursor selection, nothing else; maybe use `setSelections`
     this.editor.setSelection({ line, ch: replacement.length });
+    this.log('┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉');
   }
 
   getLineReplacement(original: string, target: string): string {
     switch (true) {
       // when the line is a task, replace the task marker
       case SwapCheckboxStatus.taskRegex.test(original):
+        this.log('detected task');
         return original.replace(SwapCheckboxStatus.taskRegex, `$1[${target}]$2`);
       // when the line is not a task, transform it into a task
       case SwapCheckboxStatus.nonTaskRegex.test(original):
+        this.log('detected non task');
         return original.replace(SwapCheckboxStatus.nonTaskRegex, `$1- [${target}] $3`);
       // when the line is blank, start a blank task
       case SwapCheckboxStatus.blankLineRegex.test(original):
+        this.log('detected blank');
         return original.replace(SwapCheckboxStatus.blankLineRegex, `$1- [${target}] `);
       // otherwise don't apply any transformation
       default:
-        return original
+        this.log('detected other');
+        return original;
     }
   }
 
@@ -101,12 +113,15 @@ class SwapCheckboxStatus {
    * @param target
    */
   transformSelection(selection: EditorSelection, target: string) {
+    this.log('start transformSelection');
+    this.log('selection', selection);
+
     const { anchor, head } = selection;
 
     // determine the start and end
-    const anchorIsStart = (anchor.ch <= head.ch) && (anchor.line <= head.line);
-    const cursorStart = (anchorIsStart) ? anchor : head;
-    const cursorEnd = (anchorIsStart) ? head : anchor;
+    const anchorIsStart = anchor.ch <= head.ch && anchor.line <= head.line;
+    const cursorStart = anchorIsStart ? anchor : head;
+    const cursorEnd = anchorIsStart ? head : anchor;
 
     // expand the selection to cover entire lines
     cursorStart.ch = 0;
@@ -116,17 +131,25 @@ class SwapCheckboxStatus {
     // get the existing original text
     let replacement = this.editor.getRange(cursorStart, cursorEnd);
 
-    // replace all the current task lines
     if (SwapCheckboxStatus.taskRegex.test(replacement)) {
+      this.log('task regex matches found');
+      // replace all the current task lines
       replacement = replacement.replace(SwapCheckboxStatus.taskRegex, `$1[${target}]$2`);
     }
 
-    // all selected non-blank lines are transformed into tasks as well
     if (SwapCheckboxStatus.nonTaskRegex.test(replacement)) {
+      this.log('non task regex matches found');
+      // all selected non-blank lines are transformed into tasks as well
       replacement = replacement.replace(SwapCheckboxStatus.nonTaskRegex, `$2- [${target}] $3`);
     }
 
+    this.log('replacement', replacement);
     this.editor.replaceRange(replacement, cursorStart, cursorEnd);
+    this.log('┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉┉');
+  }
+
+  log(...args: unknown[]) {
+    this.DEBUG && console.log(...args);
   }
 }
 
