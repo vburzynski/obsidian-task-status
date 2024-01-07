@@ -121,7 +121,7 @@ export default class Settings extends PluginSettingTab {
     // Include a button to append new items to the list of custom task statuses
     new Setting(this.containerEl).addButton((button) => {
       button
-        .setButtonText('Add New Status')
+        .setButtonText('Add new status')
         .setCta()
         .onClick(() => {
           this.plugin.settings.checkboxOptions.push({ title: 'undefined', character: 'x' });
