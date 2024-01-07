@@ -101,7 +101,7 @@ Scenario: end of selection intersects with a callout block
 ## Release Workflow
 
 ```shell
-git tag -a 1.0.4 -m "1.0.4"
-git push origin 1.0.4
-gh release create "1.0.4" --title="1.0.4" --draft main.js manifest.json styles.css
+git tag -a 1.0.5 -m "1.0.5"
+git push origin 1.0.5
+gh release create "1.0.5" --title="1.0.5" --draft main.js manifest.json styles.css
 ```
