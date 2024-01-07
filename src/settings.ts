@@ -52,8 +52,6 @@ export default class Settings extends PluginSettingTab {
    * Render the custom task statuses editing section
    */
   displayTaskStatuses(): void {
-    this.containerEl.createEl('h2', { text: 'Task Statuses' });
-
     // create a series of settings to edit the list of custom task statuses
     // the setting will have a name, two inputs (status name and marker), and buttons to move the
     // item or remove it
