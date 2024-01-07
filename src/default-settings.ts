@@ -1,8 +1,6 @@
 import { TaskStatusPluginSettings } from './types';
 
 const DEFAULT_SETTINGS: TaskStatusPluginSettings = {
-  mySetting: 'default',
-
   // prettier-ignore
   checkboxOptions: [
     { title: 'to-do',               character: ' ' },

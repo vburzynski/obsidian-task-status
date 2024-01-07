@@ -5,7 +5,6 @@ interface CommandCreator {
 }
 
 interface TaskStatusPluginSettings {
-  mySetting: string;
   checkboxOptions: CheckboxOption[],
 }
 
