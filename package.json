@@ -1,6 +1,6 @@
 {
 	"name": "obsidian-task-status",
-	"version": "1.0.3",
+	"version": "1.0.4",
 	"description": "Quickly change any task status in your Obsidian notes",
 	"main": "main.js",
 	"scripts": {
