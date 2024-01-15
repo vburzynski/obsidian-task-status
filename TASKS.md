@@ -1,26 +1,3 @@
-# Release Roadmap
-
-- [x] expand beyond a single line
-  - [x] add the ability to select multiple lines (range of lines)
-  - [x] support multiple selections
-- [x] Functionality
-  - [x] on a non-checkbox lines, add the checkbox markup with the selected character marking
-- [ ] Testing
-  - [x] Test on mac
-  - [ ] Test on mobile (iOS)
-  - [ ] Test on windows
-  - [ ] Test on linux
-- [x] Review the README
-- [ ] check the `manifest.json`
-- [ ] check the semantic versioning
-- [ ] follow the obsidian guide to release the plugin
-  - [x] create repository on GitHub
-  - [ ] create a release
-  - [ ] submit plugin for review
-  - [ ] address review comments
-- [ ] Pick out a License
-- [ ] Figure out the workflow and steps needed to submit plugin officially
-
 ## Future Roadmap
 
 ### customization and configuration
@@ -31,17 +8,20 @@
 - [x] ability to add and remove options
 - [x] ability to rename
 - [x] ability to reorder the options
-- [ ] ability to have aliases
-  - maybe this is just extending the description and showing a comma separated list)
+- [x] ~~ability to have aliases~~
+  - Cancelled for now, config allows mutliple works and fuzzy search fill match any of them
 - [ ] the settings should have presets for common themes like Things, Minimal, etc.
-- [ ] Implement Workflow Customization
-  - [ ] enable/disable transforming non-task lines into tasks
-  - [ ] enable an optional second step which prompts whether to transform tasks, non-tasks, or both.
-  - [ ] alternatively -- split into three commands:
-    - [ ] apply the task status transformation only to task lines
-    - [ ] apply the task status transformation only to non-task lines
-    - [ ] apply the task status transformation to both types of lines
-  - [ ] should the commands not have default hotkeys assigned?
+
+## Brainstorming...
+
+### Feature: Workflow Customization
+
+- [ ] enable/disable transforming non-task lines into tasks
+- [ ] enable an optional second step which prompts whether to transform tasks, non-tasks, or both.
+- [ ] alternatively -- split into three commands:
+  - [ ] apply the task status transformation only to task lines
+  - [ ] apply the task status transformation only to non-task lines
+  - [ ] apply the task status transformation to both types of lines
 
 ### Feature: Quickly apply previously selected status
 
@@ -55,7 +35,7 @@
 
 ### Commands and Hotkeys
 
-- implement individual command for each type of custom checkbox accent
+- [ ] implement individual command for each type of custom checkbox accent
   - this is allow users to directly apply a custom accent through either a hotkey or command palette.
 
 ### Multiple Line Selection Features

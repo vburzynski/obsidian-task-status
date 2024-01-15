@@ -14,9 +14,10 @@ class SwapCheckboxStatus {
   // start of a line; any amount of whitespace or `>` characters (for callouts);
   // then a dash or asterix for a bullet point, a single whitespace, then square bracket syntax
   // for the checkbox; followed by any remaining characters til the end of the line.
-  // 1st capturing group = everything before the checkbox
-  // 2nd capturing group = everything after the checkbox
-  public static readonly taskRegex = /^([\s>]*[-*]\s)\[[^\]]\](?!\()(.*)$/gm;
+  // Capturing Groups:
+  //   $1 - everything before the checkbox
+  //   $2 - everything after the checkbox
+  public static readonly taskRegex = /^([\s>]*[-*+]\s)\[[^\]]\](?!\()(.*)$/gm;
 
   /*
   (?!^#+)                                   Ignore Heading (negative lookahead)
@@ -31,8 +32,13 @@ class SwapCheckboxStatus {
   */
 
   // matches a line that is not a checklist
+  // Capturing Groups:
+  //  $1 - used internally to detect horizontal rules
+  //  $2 - indentation
+  //  $3 - bullet character
+  //  $4 - content
   public static readonly nonTaskRegex =
-    /(?!^#+)(?!^\s*$)(?!^\s{0,3}([-_*])\s*(?:\1 *){2,}$)(?!^[\s>]* \[![\w-]+\])^(?!(?:\s*>?)*\s*[-*+]\s+\[[^\]]\](?!\())([>\s]*)?(?:(?:[-*+]|[0-9]+\.)\s)?(.*)/gm;
+    /(?!^#+)(?!^\s*$)(?!^\s{0,3}([-_*])\s*(?:\1 *){2,}$)(?!^[\s>]* \[![\w-]+\])^(?!(?:\s*>?)*\s*[-*+]\s+\[[^\]]\](?!\())([>\s]*)?(?:(?:([-*+])|[0-9]+\.)\s)?(.*)/gm;
 
   // matches a blank line
   public static readonly blankLineRegex = /^(\s*)$/gm;
@@ -91,21 +97,40 @@ class SwapCheckboxStatus {
     switch (true) {
       // when the line is a task, replace the task marker
       case SwapCheckboxStatus.taskRegex.test(original):
-        this.log('detected task');
-        return original.replace(SwapCheckboxStatus.taskRegex, `$1[${target}]$2`);
+        return this.transformTasks(original, target);
       // when the line is not a task, transform it into a task
       case SwapCheckboxStatus.nonTaskRegex.test(original):
-        this.log('detected non task');
-        return original.replace(SwapCheckboxStatus.nonTaskRegex, `$1- [${target}] $3`);
+        return this.transformNonTasks(original, target);
       // when the line is blank, start a blank task
       case SwapCheckboxStatus.blankLineRegex.test(original):
-        this.log('detected blank');
-        return original.replace(SwapCheckboxStatus.blankLineRegex, `$1- [${target}] `);
+        return this.transformBlankLines(original, target);
       // otherwise don't apply any transformation
       default:
         this.log('detected other');
         return original;
     }
+  }
+
+  transformTasks(original: string, target: string) {
+    this.log('transforming task(s)');
+    return original.replace(SwapCheckboxStatus.taskRegex, `$1[${target}]$2`);
+  }
+
+  transformNonTasks(original: string, target: string) {
+    this.log('transforming non-task(s)');
+    const regex = new RegExp(SwapCheckboxStatus.nonTaskRegex.source, 'gm');
+    const parts = regex.exec(original);
+    if (parts === null) return original;
+
+    // match 1 is a used inside the regex to detect horizontal rules
+    // use matches 2 (indentation) and 3 (the content);
+    const bullet = parts[3] || '-';
+    return original.replace(regex, `$2${bullet} [${target}] $4`);
+  }
+
+  transformBlankLines(original: string, target: string) {
+    this.log('transforming blank line(s)');
+    return original.replace(SwapCheckboxStatus.blankLineRegex, `$1- [${target}] `);
   }
 
   /**
@@ -132,17 +157,17 @@ class SwapCheckboxStatus {
     // get the existing original text
     let replacement = this.editor.getRange(cursorStart, cursorEnd);
 
+    // transform selected lines that contain tasks
     if (SwapCheckboxStatus.taskRegex.test(replacement)) {
-      this.log('task regex matches found');
-      // replace all the current task lines
-      replacement = replacement.replace(SwapCheckboxStatus.taskRegex, `$1[${target}]$2`);
+      replacement = this.transformTasks(replacement, target);
     }
 
+    // all selected non-blank lines are transformed into tasks as well
     if (SwapCheckboxStatus.nonTaskRegex.test(replacement)) {
-      this.log('non task regex matches found');
-      // all selected non-blank lines are transformed into tasks as well
-      replacement = replacement.replace(SwapCheckboxStatus.nonTaskRegex, `$2- [${target}] $3`);
+      replacement = this.transformNonTasks(replacement, target);
     }
+
+    // NOTE: non-blank lines are left blank when muli-line selection is used
 
     this.log('replacement', replacement);
     this.editor.replaceRange(replacement, cursorStart, cursorEnd);

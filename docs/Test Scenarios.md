@@ -3,6 +3,16 @@
 - This is the start of an attempt to enumerate the number of scenarios that might need to be handled and/or tested
 - There's probably opportunity to combine a lot of this, and focus on outliers and patterns instead.
 
+## Other
+
+- transforming a single line
+  - line is indented
+  - line is not indented
+  - line is a task
+  - line is not a task
+- transforming a selection
+  - containing indented lines
+
 ## Leaf Blocks
 
 - [ ] Paragraphs and lines of text
@@ -41,6 +51,7 @@
 - [ ] Lists
   - [ ] lists included as part of a paragraph
   - [ ] lists included as part of a block (example: quote block)
+  - [ ] list item with child list
 - [ ] List Items
   - [ ] ordered (`*`, `-`, `+`)
   - [ ] unordered
