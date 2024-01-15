@@ -1,5 +1,7 @@
 import { App, PluginSettingTab, Setting } from 'obsidian';
-import { TaskStatusPluginInterface } from './types';
+import { CheckboxOption, TaskStatusPluginInterface } from './types';
+import { themes } from './themes';
+import DEFAULT_SETTINGS from './default-settings';
 
 /**
  * Swap two indexes in an array
@@ -46,6 +48,8 @@ export default class Settings extends PluginSettingTab {
     const { containerEl } = this;
     containerEl.empty();
     this.displayTaskStatuses();
+    this.displayListActions();
+    this.displayImportOptions();
   }
 
   /**
@@ -117,16 +121,61 @@ export default class Settings extends PluginSettingTab {
             });
         });
     });
+  }
 
-    // Include a button to append new items to the list of custom task statuses
-    new Setting(this.containerEl).addButton((button) => {
-      button
-        .setButtonText('Add new status')
-        .setCta()
-        .onClick(() => {
-          this.plugin.settings.checkboxOptions.push({ title: 'undefined', character: 'x' });
-          this.plugin.saveSettings();
-          this.display();
+  displayListActions() {
+    new Setting(this.containerEl)
+      .setName('Status List Actions')
+      .addButton((button) => {
+        button
+          .setButtonText('Clear list')
+          .setWarning()
+          .onClick(() => {
+            this.plugin.settings.checkboxOptions = [];
+            this.plugin.saveSettings();
+            this.display();
+          });
+      })
+      .addButton((button) => {
+        button
+          .setButtonText('Reset to default')
+          .onClick(() => {
+            this.plugin.settings = structuredClone(DEFAULT_SETTINGS);
+            this.plugin.saveSettings();
+            this.display();
+          });
+      })
+      .addButton((button) => {
+        button
+          .setButtonText('Add new status')
+          .setCta()
+          .onClick(() => {
+            this.plugin.settings.checkboxOptions.push({ title: 'undefined', character: 'x' });
+            this.plugin.saveSettings();
+            this.display();
+          });
+      });
+  }
+
+  displayImportOptions() {
+    themes.forEach(({name, statuses}) => {
+      new Setting(this.containerEl)
+        .setName(name)
+        .setDesc(`Add any missing custom checkbox statuses supported by the ${name}.`)
+        .addButton((button) => {
+          button.setButtonText(name).onClick(async () => {
+            statuses.forEach((option: CheckboxOption) => {
+              // console.log(`checking option ${option.title} -- ${option.character}`)
+              const found = this.plugin.settings.checkboxOptions.some((o) => o.character == option.character)
+              // console.log(`found?`, found);
+              if(!found) {
+                this.plugin.settings.checkboxOptions.push({ ...option });
+                // console.log("added option");
+              }
+            });
+            this.plugin.saveSettings();
+            this.display();
+          });
         });
     });
   }
