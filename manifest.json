@@ -1,7 +1,7 @@
 {
 	"id": "task-status",
 	"name": "Task Status",
-	"version": "1.0.5",
+	"version": "1.0.6",
 	"minAppVersion": "0.15.0",
 	"description": "Quickly select and apply custom task status markers",
 	"author": "Valerie Burzynski",
