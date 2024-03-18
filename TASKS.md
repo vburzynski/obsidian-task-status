@@ -1,27 +1,6 @@
-## Future Roadmap
+# Tasks
 
-### customization and configuration
-
-- [x] make the accents customizable through the settings
-- [x] customize the checkbox options using the settings menu
-- [x] ability to customize all of the options
-- [x] ability to add and remove options
-- [x] ability to rename
-- [x] ability to reorder the options
-- [x] ~~ability to have aliases~~
-  - Cancelled for now, config allows mutliple works and fuzzy search fill match any of them
-- [ ] the settings should have presets for common themes like Things, Minimal, etc.
-
-## Brainstorming...
-
-### Feature: Workflow Customization
-
-- [ ] enable/disable transforming non-task lines into tasks
-- [ ] enable an optional second step which prompts whether to transform tasks, non-tasks, or both.
-- [ ] alternatively -- split into three commands:
-  - [ ] apply the task status transformation only to task lines
-  - [ ] apply the task status transformation only to non-task lines
-  - [ ] apply the task status transformation to both types of lines
+## Brainstorming
 
 ### Feature: Quickly apply previously selected status
 
@@ -36,7 +15,7 @@
 ### Commands and Hotkeys
 
 - [ ] implement individual command for each type of custom checkbox accent
-  - this is allow users to directly apply a custom accent through either a hotkey or command palette.
+  - this would allow users to directly apply a custom accent through either a hotkey or command palette.
 
 ### Multiple Line Selection Features
 
@@ -67,16 +46,6 @@ Scenario: end of selection intersects with a code block
 Scenario: start of selection intersects with a callout block
 Scenario: end of selection intersects with a callout block
 ```
-
-## Bug Fixes
-
-- [x] making a multi-line selection in reverse (down to up), doesn't work
-- [x] when a selection range doesn't start at the beginning of a line, the checkbox marker gets added at the start of the selection, not the start of the line.
-
-## Other Ideas
-
-- [ ] ability to quickly make a checkbox into a non-checkbox.
-  - would this become a list item or regular text? (probably an unordered list item)
 
 ## Release Workflow
 
