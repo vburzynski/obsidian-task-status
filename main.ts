@@ -12,6 +12,7 @@ export default class TaskStatusPlugin extends Plugin implements TaskStatusPlugin
    * Setup the plugin when it loads in obsidian
    */
   async onload() {
+    console.log('loading Obsidian Task Status');
     await this.loadSettings();
     registerRibbon(this);
     this.addCommand(changeTaskStatus(this));
@@ -21,7 +22,9 @@ export default class TaskStatusPlugin extends Plugin implements TaskStatusPlugin
   /**
    * Teardown the plugin when it gets unloaded
    */
-  onunload() {}
+  onunload() {
+    console.log('unloading Obsidian Task Status');
+  }
 
   /**
    * Trigger the rendering of the settings view

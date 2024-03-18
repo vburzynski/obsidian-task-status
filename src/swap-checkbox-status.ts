@@ -1,4 +1,4 @@
-import { Editor, EditorSelection } from 'obsidian';
+import { Editor, EditorPosition, EditorSelection } from 'obsidian';
 
 // TODO: ignore certain types of blocks -- like comment blocks and code blocks
 
@@ -8,7 +8,7 @@ class SwapCheckboxStatus {
   /**
    * When true, the class will output debug console messages
    */
-  DEBUG = false;
+  DEBUG = true;
 
   // matches a checklist item:
   // start of a line; any amount of whitespace or `>` characters (for callouts);
@@ -17,7 +17,7 @@ class SwapCheckboxStatus {
   // Capturing Groups:
   //   $1 - everything before the checkbox
   //   $2 - everything after the checkbox
-  public static readonly taskRegex = /^([\s>]*[-*+]\s)\[[^\]]\](?!\()(.*)$/gm;
+  public static readonly taskRegex = /^([\s>]*[-*+]\s)\[[^\]]\](?!\()(.*)$/m;
 
   /*
   (?!^#+)                                   Ignore Heading (negative lookahead)
@@ -38,10 +38,10 @@ class SwapCheckboxStatus {
   //  $3 - bullet character
   //  $4 - content
   public static readonly nonTaskRegex =
-    /(?!^#+)(?!^\s*$)(?!^\s{0,3}([-_*])\s*(?:\1 *){2,}$)(?!^[\s>]* \[![\w-]+\])^(?!(?:\s*>?)*\s*[-*+]\s+\[[^\]]\](?!\())([>\s]*)?(?:(?:([-*+])|[0-9]+\.)\s)?(.*)/gm;
+    /(?!^#+)(?!^\s*$)(?!^\s{0,3}([-_*])\s*(?:\1 *){2,}$)(?!^[\s>]* \[![\w-]+\])^(?!(?:\s*>?)*\s*[-*+]\s+\[[^\]]\](?!\())([>\s]*)?(?:(?:([-*+])|[0-9]+\.)\s)?(.*)/m;
 
   // matches a blank line
-  public static readonly blankLineRegex = /^(\s*)$/gm;
+  public static readonly blankLineRegex = /^(\s*)$/m;
 
   constructor(editor: Editor) {
     this.editor = editor;
@@ -64,9 +64,9 @@ class SwapCheckboxStatus {
    * @param marker the status marker to put inside the checkbox
    */
   transformSelectionOrLine(selection: EditorSelection, marker: string) {
-    this.log('selection', selection);
+    this.log(`selection:\n${selection}`);
     if (selection.anchor.line === selection.head.line && selection.anchor.ch === selection.head.ch) {
-      this.transformLine(selection.anchor.line, marker);
+      this.transformLine(selection.anchor, marker);
     } else {
       this.transformSelection(selection, marker);
     }
@@ -77,20 +77,24 @@ class SwapCheckboxStatus {
    * @param line the line number
    * @param target the status marker to put inside the checkbox
    */
-  transformLine(line: number, target: string) {
+  transformLine(anchor: EditorPosition, target: string) {
+    const line: number = anchor.line;
     this.log('start transformLine');
     const original = this.editor.getLine(line);
     const replacement = this.getLineReplacement(original, target);
 
-    this.log('original', original);
-    this.log('replacement', replacement);
+    this.log(`original:\n${original}`);
+    this.log(`replacement:\n${replacement}`);
 
     this.editor.setLine(line, replacement);
 
-    // TODO: make this configurable in the settings (jump to end of line)
-    // TODO: retain jumping to the end of the line when it is blank
-    // TODO: this only retains the final cursor selection, nothing else; maybe use `setSelections`
-    this.editor.setSelection({ line, ch: replacement.length });
+    let ch = replacement.length;
+    if (original.length === replacement.length) {
+      ch = anchor.ch;
+    } else {
+      ch = anchor.ch + replacement.length - original.length;
+    }
+    this.editor.setSelection({ line, ch });
   }
 
   getLineReplacement(original: string, target: string): string {

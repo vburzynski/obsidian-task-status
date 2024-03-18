@@ -165,12 +165,9 @@ export default class Settings extends PluginSettingTab {
         .addButton((button) => {
           button.setButtonText(name).onClick(async () => {
             statuses.forEach((option: CheckboxOption) => {
-              // console.log(`checking option ${option.title} -- ${option.character}`)
               const found = this.plugin.settings.checkboxOptions.some((o) => o.character == option.character)
-              // console.log(`found?`, found);
               if(!found) {
                 this.plugin.settings.checkboxOptions.push({ ...option });
-                // console.log("added option");
               }
             });
             this.plugin.saveSettings();
