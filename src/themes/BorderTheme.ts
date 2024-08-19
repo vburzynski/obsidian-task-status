@@ -4,7 +4,7 @@ import { Theme } from "./types";
  * Statuses supported by the Border theme.
  * {@link https://github.com/Akifyss/obsidian-border}
  */
-export const ThingsTheme: Theme = {
+export const BorderTheme: Theme = {
   name: 'Border Theme',
   statuses: [
     // Basic
