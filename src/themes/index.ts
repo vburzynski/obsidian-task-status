@@ -5,6 +5,7 @@ import { ITSTheme } from './ITSTheme';
 import { LYTModeTheme } from './LYTModeTheme';
 import { MinimalTheme } from './MinimalTheme';
 import { ThingsTheme } from './ThingsTheme';
+import { BorderTheme } from './BorderTheme';
 
 export const themes = [
   AnuPpuccinTheme,
@@ -14,4 +15,5 @@ export const themes = [
   LYTModeTheme,
   MinimalTheme,
   ThingsTheme,
+  BorderTheme,
 ];
