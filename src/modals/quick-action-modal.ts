@@ -44,6 +44,7 @@ export default class QuickActionModal extends SuggestModal<CheckboxOption> {
       alignItems: 'center',
       textAlign: 'center',
     });
+    el.setAttribute('data-task', option.character);
 
     // show a preview of the checkbox
     const input = el.createEl('input', {
