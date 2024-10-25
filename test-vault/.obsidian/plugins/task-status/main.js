@@ -241,6 +241,35 @@ var ThingsTheme = {
   ]
 };
 
+// src/themes/BorderTheme.ts
+var BorderTheme = {
+  name: "Border Theme",
+  statuses: [
+    // Basic
+    { character: " ", title: "To Do" },
+    { character: "/", title: "In Progress" },
+    { character: "x", title: "Done" },
+    { character: "-", title: "Canceled" },
+    { character: ">", title: "Rescheduled" },
+    { character: "<", title: "Scheduled" },
+    // Extras
+    { character: "!", title: "Important" },
+    { character: "?", title: "Question" },
+    { character: "i", title: "Information" },
+    { character: "S", title: "Amount" },
+    { character: "*", title: "Star" },
+    { character: "b", title: "Bookmark" },
+    { character: '"', title: "Quote" },
+    { character: "n", title: "Note" },
+    { character: "l", title: "Location" },
+    { character: "I", title: "Idea" },
+    { character: "p", title: "Pro" },
+    { character: "c", title: "Con" },
+    { character: "u", title: "up" },
+    { character: "d", title: "down" }
+  ]
+};
+
 // src/themes/index.ts
 var themes = [
   AnuPpuccinTheme,
@@ -249,7 +278,8 @@ var themes = [
   ITSTheme,
   LYTModeTheme,
   MinimalTheme,
-  ThingsTheme
+  ThingsTheme,
+  BorderTheme
 ];
 
 // src/default-settings.ts
@@ -596,12 +626,20 @@ var QuickActionModal = class extends import_obsidian2.SuggestModal {
       alignItems: "center",
       textAlign: "center"
     });
+    el.setAttribute("data-task", option.character);
+    el.classList.add("task-list-item");
+    if (option.character !== " ") {
+      el.classList.add("is-checked");
+    }
     const input = el.createEl("input", {
       attr: {
         "type": "checkbox",
         "data-task": option.character
       }
     });
+    if (option.character !== " ") {
+      input.classList.add("is-checked");
+    }
     input.classList.add("task-list-item");
     input.checked = option.character !== " ";
     const span = el.createEl("span", { text: option.title });
@@ -685,6 +723,3 @@ var TaskStatusPlugin = class extends import_obsidian4.Plugin {
     await this.saveData(this.settings);
   }
 };
-
-
-/* nosourcemap */
