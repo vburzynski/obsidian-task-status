@@ -17,6 +17,10 @@ Please note, that this plugin assumes that you have either installed an Obsidian
 custom task status styling (such as Things or Minimal), or that you've created and applied your own
 CSS snippet to style tasks.
 
+- [Setup AnuPpuccin Theme](./docs/Setup%20AnuPpuccin%20Theme.md)
+- [Setup ITS Theme](./docs/Setup%20ITS%20Theme.md)
+- [Setup Minimal Theme](./docs/Setup%20Minimal%20Theme.md)
+
 ## Why this plugin?
 
 - keyboard driven

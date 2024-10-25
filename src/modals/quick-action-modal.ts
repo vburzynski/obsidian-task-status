@@ -45,6 +45,13 @@ export default class QuickActionModal extends SuggestModal<CheckboxOption> {
       textAlign: 'center',
     });
 
+    // set a bunch of attributes so that the preview will be targeted by various themes
+    el.setAttribute('data-task', option.character);
+    el.classList.add('task-list-item');
+    if (option.character !== ' ') {
+      el.classList.add('is-checked');
+    }
+
     // show a preview of the checkbox
     const input = el.createEl('input', {
       attr: {
@@ -52,8 +59,13 @@ export default class QuickActionModal extends SuggestModal<CheckboxOption> {
         'data-task': option.character,
       },
     });
+
+    // set a bunch of attributes so that the preview will be targeted by various themes
     input.classList.add('task-list-item');
     input.checked = option.character !== ' ';
+    if (option.character !== ' ') {
+      input.classList.add('is-checked');
+    }
 
     // show the name of the checkbox option
     const span = el.createEl("span", { text: option.title });
