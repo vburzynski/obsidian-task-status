@@ -176,7 +176,7 @@ class SwapCheckboxStatus {
    * @param args arguments to pass on to console.log
    */
   log(...args: unknown[]) {
-    this.DEBUG && console.log(...args);
+    this.DEBUG && console.log(...args); // eslint-disable-line @typescript-eslint/no-unused-expressions
   }
 }
 
