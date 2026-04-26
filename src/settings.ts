@@ -47,9 +47,39 @@ export default class Settings extends PluginSettingTab {
   display(): void {
     const { containerEl } = this;
     containerEl.empty();
+    this.displayReadingModeOptions();
     this.displayTaskStatuses();
     this.displayListActions();
     this.displayImportOptions();
+  }
+
+  displayReadingModeOptions(): void {
+    new Setting(this.containerEl)
+      .setName('Long-press checkbox to pick status')
+      .setDesc('Long-press (or right-click) a task checkbox in reading mode or live preview to open the status picker. Native click still toggles done/not-done.')
+      .addToggle((toggle) => {
+        toggle
+          .setValue(this.plugin.settings.enableReadingModeLongPress)
+          .onChange(async (value) => {
+            this.plugin.settings.enableReadingModeLongPress = value;
+            await this.plugin.saveSettings();
+          });
+      });
+
+    new Setting(this.containerEl)
+      .setName('Long-press duration (ms)')
+      .setDesc('Time to hold the checkbox before the status picker opens.')
+      .addText((text) => {
+        text
+          .setValue(String(this.plugin.settings.longPressDurationMs))
+          .onChange(async (value) => {
+            const n = Number.parseInt(value, 10);
+            if (Number.isFinite(n) && n >= 100 && n <= 5000) {
+              this.plugin.settings.longPressDurationMs = n;
+              await this.plugin.saveSettings();
+            }
+          });
+      });
   }
 
   /**

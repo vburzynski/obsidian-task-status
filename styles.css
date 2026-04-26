@@ -1,8 +1,9 @@
-/*
-
-This CSS file will be included with your plugin, and
-available in the app when your plugin is enabled.
-
-If your plugin does not need CSS, delete this file.
-
-*/
+/* Suppress iOS long-press selection callout / text selection on task checkboxes
+   so the long-press handler can open the status picker without competing with
+   the native iOS context menu. */
+input.task-list-item-checkbox {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  user-select: none;
+  touch-action: manipulation;
+}
