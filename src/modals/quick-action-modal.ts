@@ -1,4 +1,4 @@
-import { Notice, SuggestModal, App } from "obsidian";
+import { SuggestModal, App } from "obsidian";
 import SwapCheckboxStatus from "src/swap-checkbox-status";
 import swapInLine from "src/swap-line";
 import { CheckboxOption, ModalTarget, TaskStatusPluginInterface } from "src/types";
@@ -51,7 +51,6 @@ export default class QuickActionModal extends SuggestModal<CheckboxOption> {
   }
 
   onChooseSuggestion(option: CheckboxOption, _evt: MouseEvent | KeyboardEvent) {
-    new Notice(`Selected ${option.title}`);
     if (this.target.kind === 'editor') {
       new SwapCheckboxStatus(this.target.editor).swap(option.character);
     } else {
