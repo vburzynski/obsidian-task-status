@@ -1,4 +1,4 @@
-import { Command, MarkdownView, Editor } from "obsidian";
+import { Command, MarkdownView, Editor, MarkdownFileInfo } from "obsidian";
 import { TaskStatusPluginInterface } from "src/types";
 import QuickActionModal from '../modals/quick-action-modal';
 
@@ -10,11 +10,9 @@ import QuickActionModal from '../modals/quick-action-modal';
 const changeTaskStatus = (plugin: TaskStatusPluginInterface): Command => ({
   id: 'change-task-status',
   name: 'change task status',
-  // hotkeys: [{ modifiers: ["Mod", "Shift"], key: "l" }],
-  editorCallback: (editor: Editor, view: MarkdownView) => {
-    new QuickActionModal(plugin.app, plugin, editor).open();
+  editorCallback: (editor: Editor, _view: MarkdownView | MarkdownFileInfo) => {
+    new QuickActionModal(plugin.app, plugin, { kind: 'editor', editor }).open();
   }
 });
 
 export default changeTaskStatus;
-

@@ -1,24 +1,19 @@
-import { Editor, Notice, SuggestModal, App } from "obsidian";
+import { SuggestModal, App } from "obsidian";
 import SwapCheckboxStatus from "src/swap-checkbox-status";
-import { CheckboxOption, TaskStatusPluginInterface } from "src/types";
+import swapInLine from "src/swap-line";
+import { CheckboxOption, ModalTarget, TaskStatusPluginInterface } from "src/types";
 
 /**
  * A serchable modal that allows the user to select a checkbox status symbol
  */
 export default class QuickActionModal extends SuggestModal<CheckboxOption> {
-  editor: Editor;
   plugin: TaskStatusPluginInterface;
+  target: ModalTarget;
 
-  /**
-   *
-   * @param app Obsidian instance
-   * @param plugin plugin instance
-   * @param editor editor instance
-   */
-  constructor(app: App, plugin: TaskStatusPluginInterface, editor: Editor) {
+  constructor(app: App, plugin: TaskStatusPluginInterface, target: ModalTarget) {
     super(app);
     this.plugin = plugin;
-    this.editor = editor;
+    this.target = target;
   }
 
   /**
@@ -77,8 +72,12 @@ export default class QuickActionModal extends SuggestModal<CheckboxOption> {
    * @param option the option selected by the user
    * @param evt the triggering mouse or keyboard event
    */
-  onChooseSuggestion(option: CheckboxOption, evt: MouseEvent | KeyboardEvent) {
-    new Notice(`Selected ${option.title}`);
-    new SwapCheckboxStatus(this.editor).swap(option.character);
+  onChooseSuggestion(option: CheckboxOption, _evt: MouseEvent | KeyboardEvent) {
+    if (this.target.kind === 'editor') {
+      new SwapCheckboxStatus(this.target.editor).swap(option.character);
+    } else {
+      const { file, line } = this.target;
+      this.app.vault.process(file, (content) => swapInLine(content, line, option.character));
+    }
   }
 }

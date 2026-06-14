@@ -27,7 +27,7 @@ export default (plugin: TaskStatusPluginInterface) => {
       if (!activeView) return;
 
       const editor = activeView.editor;
-      new QuickActionModal(plugin.app, plugin, editor).open();
+      new QuickActionModal(plugin.app, plugin, { kind: 'editor', editor }).open();
     }
   );
 }

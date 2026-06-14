@@ -29,6 +29,8 @@ const DEFAULT_SETTINGS: TaskStatusPluginSettings = {
     { title: 'open pull request',   character: 'P' },
     { title: 'merged pull request', character: 'M' },
   ],
+  enableReadingModeLongPress: true,
+  longPressDurationMs: 500,
 };
 
 export default DEFAULT_SETTINGS;
