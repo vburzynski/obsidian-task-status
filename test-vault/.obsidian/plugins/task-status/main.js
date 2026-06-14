@@ -27,7 +27,7 @@ __export(main_exports, {
   default: () => TaskStatusPlugin
 });
 module.exports = __toCommonJS(main_exports);
-var import_obsidian4 = require("obsidian");
+var import_obsidian5 = require("obsidian");
 
 // src/settings.ts
 var import_obsidian = require("obsidian");
@@ -311,7 +311,9 @@ var DEFAULT_SETTINGS = {
     { title: "draft pull request", character: "D" },
     { title: "open pull request", character: "P" },
     { title: "merged pull request", character: "M" }
-  ]
+  ],
+  enableReadingModeLongPress: true,
+  longPressDurationMs: 500
 };
 var default_settings_default = DEFAULT_SETTINGS;
 
@@ -343,9 +345,27 @@ var Settings = class extends import_obsidian.PluginSettingTab {
   display() {
     const { containerEl } = this;
     containerEl.empty();
+    this.displayReadingModeOptions();
     this.displayTaskStatuses();
     this.displayListActions();
     this.displayImportOptions();
+  }
+  displayReadingModeOptions() {
+    new import_obsidian.Setting(this.containerEl).setName("Long-press checkbox to pick status").setDesc("Long-press (or right-click) a task checkbox in reading mode or live preview to open the status picker. Native click still toggles done/not-done.").addToggle((toggle) => {
+      toggle.setValue(this.plugin.settings.enableReadingModeLongPress).onChange(async (value) => {
+        this.plugin.settings.enableReadingModeLongPress = value;
+        await this.plugin.saveSettings();
+      });
+    });
+    new import_obsidian.Setting(this.containerEl).setName("Long-press duration (ms)").setDesc("Time to hold the checkbox before the status picker opens.").addText((text) => {
+      text.setValue(String(this.plugin.settings.longPressDurationMs)).onChange(async (value) => {
+        const n = Number.parseInt(value, 10);
+        if (Number.isFinite(n) && n >= 100 && n <= 5e3) {
+          this.plugin.settings.longPressDurationMs = n;
+          await this.plugin.saveSettings();
+        }
+      });
+    });
   }
   /**
    * Render the custom task statuses editing section
@@ -474,45 +494,36 @@ ${selection}`);
    */
   transformLine(anchor, target) {
     const line = anchor.line;
-    this.log("start transformLine");
     const original = this.editor.getLine(line);
-    const replacement = this.getLineReplacement(original, target);
-    this.log(`original:
-${original}`);
-    this.log(`replacement:
-${replacement}`);
+    const replacement = _SwapCheckboxStatus.replaceLine(original, target);
     this.editor.setLine(line, replacement);
-    let ch = replacement.length;
-    if (original.length === replacement.length) {
-      ch = anchor.ch;
-    } else {
-      ch = anchor.ch + replacement.length - original.length;
-    }
+    const ch = original.length === replacement.length ? anchor.ch : anchor.ch + replacement.length - original.length;
     this.editor.setSelection({ line, ch });
   }
-  getLineReplacement(original, target) {
+  /**
+   * Pure (editor-free) line transformation. Shared between editor and
+   * file-write code paths.
+   */
+  static replaceLine(original, target) {
     _SwapCheckboxStatus.taskRegex.lastIndex = 0;
-    _SwapCheckboxStatus.nonTaskRegex.lastIndex = 0;
-    _SwapCheckboxStatus.blankLineRegex.lastIndex = 0;
-    switch (true) {
-      case _SwapCheckboxStatus.taskRegex.test(original):
-        return this.transformTasks(original, target);
-      case _SwapCheckboxStatus.nonTaskRegex.test(original):
-        return this.transformNonTasks(original, target);
-      case _SwapCheckboxStatus.blankLineRegex.test(original):
-        return this.transformBlankLines(original, target);
-      default:
-        this.log("detected other");
-        return original;
+    if (_SwapCheckboxStatus.taskRegex.test(original)) {
+      return _SwapCheckboxStatus.transformTasks(original, target);
     }
+    _SwapCheckboxStatus.nonTaskRegex.lastIndex = 0;
+    if (_SwapCheckboxStatus.nonTaskRegex.test(original)) {
+      return _SwapCheckboxStatus.transformNonTasks(original, target);
+    }
+    _SwapCheckboxStatus.blankLineRegex.lastIndex = 0;
+    if (_SwapCheckboxStatus.blankLineRegex.test(original)) {
+      return _SwapCheckboxStatus.transformBlankLines(original, target);
+    }
+    return original;
   }
-  transformTasks(original, target) {
-    this.log("transforming task(s)");
+  static transformTasks(original, target) {
     _SwapCheckboxStatus.taskRegex.lastIndex = 0;
     return original.replace(_SwapCheckboxStatus.taskRegex, `$1[${target}]$2`);
   }
-  transformNonTasks(original, target) {
-    this.log("transforming non-task(s)");
+  static transformNonTasks(original, target) {
     _SwapCheckboxStatus.nonTaskRegex.lastIndex = 0;
     const parts = _SwapCheckboxStatus.nonTaskRegex.exec(original);
     if (parts === null)
@@ -520,8 +531,7 @@ ${replacement}`);
     const bullet = parts[3] || "-";
     return original.replace(_SwapCheckboxStatus.nonTaskRegex, `$2${bullet} [${target}] $4`);
   }
-  transformBlankLines(original, target) {
-    this.log("transforming blank line(s)");
+  static transformBlankLines(original, target) {
     _SwapCheckboxStatus.blankLineRegex.lastIndex = 0;
     return original.replace(_SwapCheckboxStatus.blankLineRegex, `$1- [${target}] `);
   }
@@ -543,11 +553,11 @@ ${replacement}`);
     let replacement = this.editor.getRange(cursorStart, cursorEnd);
     _SwapCheckboxStatus.taskRegex.lastIndex = 0;
     if (_SwapCheckboxStatus.taskRegex.test(replacement)) {
-      replacement = this.transformTasks(replacement, target);
+      replacement = _SwapCheckboxStatus.transformTasks(replacement, target);
     }
     _SwapCheckboxStatus.nonTaskRegex.lastIndex = 0;
     if (_SwapCheckboxStatus.nonTaskRegex.test(replacement)) {
-      replacement = this.transformNonTasks(replacement, target);
+      replacement = _SwapCheckboxStatus.transformNonTasks(replacement, target);
     }
     this.log("replacement", replacement);
     this.editor.replaceRange(replacement, cursorStart, cursorEnd);
@@ -591,34 +601,31 @@ _SwapCheckboxStatus.blankLineRegex = /^(\s*)$/gm;
 var SwapCheckboxStatus = _SwapCheckboxStatus;
 var swap_checkbox_status_default = SwapCheckboxStatus;
 
+// src/swap-line.ts
+function swapInLine(content, line, marker) {
+  const lines = content.split("\n");
+  if (line < 0 || line >= lines.length)
+    return content;
+  const original = lines[line];
+  const replacement = swap_checkbox_status_default.replaceLine(original, marker);
+  if (replacement === original)
+    return content;
+  lines[line] = replacement;
+  return lines.join("\n");
+}
+
 // src/modals/quick-action-modal.ts
 var QuickActionModal = class extends import_obsidian2.SuggestModal {
-  /**
-   *
-   * @param app Obsidian instance
-   * @param plugin plugin instance
-   * @param editor editor instance
-   */
-  constructor(app, plugin, editor) {
+  constructor(app, plugin, target) {
     super(app);
     this.plugin = plugin;
-    this.editor = editor;
+    this.target = target;
   }
-  /**
-   * filters the checkbox options; the results are used as suggestions
-   * @param query the search string
-   * @returns collection of options
-   */
   getSuggestions(query) {
     return this.plugin.settings.checkboxOptions.filter(
       (option) => option.title.toLowerCase().includes(query.toLowerCase())
     );
   }
-  /**
-   * renders each suggestion
-   * @param option the checkbox option to display
-   * @param el the suggestion HTML element
-   */
   renderSuggestion(option, el) {
     el.setCssStyles({
       display: "flex",
@@ -637,22 +644,21 @@ var QuickActionModal = class extends import_obsidian2.SuggestModal {
         "data-task": option.character
       }
     });
+    input.classList.add("task-list-item");
+    input.checked = option.character !== " ";
     if (option.character !== " ") {
       input.classList.add("is-checked");
     }
-    input.classList.add("task-list-item");
-    input.checked = option.character !== " ";
     const span = el.createEl("span", { text: option.title });
     span.classList.add("cm-list-1");
   }
-  /**
-   * Handler for when the user chooses an option
-   * @param option the option selected by the user
-   * @param evt the triggering mouse or keyboard event
-   */
-  onChooseSuggestion(option, evt) {
-    new import_obsidian2.Notice(`Selected ${option.title}`);
-    new swap_checkbox_status_default(this.editor).swap(option.character);
+  onChooseSuggestion(option, _evt) {
+    if (this.target.kind === "editor") {
+      new swap_checkbox_status_default(this.target.editor).swap(option.character);
+    } else {
+      const { file, line } = this.target;
+      this.app.vault.process(file, (content) => swapInLine(content, line, option.character));
+    }
   }
 };
 
@@ -676,49 +682,170 @@ var register_ribbon_default = (plugin) => {
       if (!activeView)
         return;
       const editor = activeView.editor;
-      new QuickActionModal(plugin.app, plugin, editor).open();
+      new QuickActionModal(plugin.app, plugin, { kind: "editor", editor }).open();
     }
   );
 };
+
+// src/register-checkbox-handlers.ts
+var import_obsidian4 = require("obsidian");
+var MOVEMENT_THRESHOLD_PX = 10;
+function registerCheckboxHandlers(plugin) {
+  const root = plugin.app.workspace.containerEl;
+  let timer = null;
+  let startX = 0;
+  let startY = 0;
+  let pendingTarget = null;
+  let suppressClick = false;
+  const cancel = () => {
+    if (timer !== null) {
+      window.clearTimeout(timer);
+      timer = null;
+    }
+    pendingTarget = null;
+  };
+  const isCheckbox = (n) => n instanceof HTMLInputElement && n.classList.contains("task-list-item-checkbox");
+  plugin.registerDomEvent(
+    root,
+    "pointerdown",
+    (evt) => {
+      if (!isCheckbox(evt.target))
+        return;
+      if (!plugin.settings.enableReadingModeLongPress)
+        return;
+      cancel();
+      pendingTarget = evt.target;
+      startX = evt.clientX;
+      startY = evt.clientY;
+      timer = window.setTimeout(() => {
+        const target = pendingTarget;
+        timer = null;
+        pendingTarget = null;
+        if (!target)
+          return;
+        suppressClick = true;
+        openModalForCheckbox(plugin, target);
+      }, plugin.settings.longPressDurationMs);
+    },
+    true
+  );
+  plugin.registerDomEvent(
+    root,
+    "pointermove",
+    (evt) => {
+      if (timer === null)
+        return;
+      const dx = evt.clientX - startX;
+      const dy = evt.clientY - startY;
+      if (dx * dx + dy * dy > MOVEMENT_THRESHOLD_PX * MOVEMENT_THRESHOLD_PX)
+        cancel();
+    },
+    true
+  );
+  plugin.registerDomEvent(root, "pointerup", cancel, true);
+  plugin.registerDomEvent(root, "pointercancel", cancel, true);
+  plugin.registerDomEvent(root, "pointerleave", cancel, true);
+  plugin.registerDomEvent(
+    root,
+    "click",
+    (evt) => {
+      if (!isCheckbox(evt.target))
+        return;
+      if (suppressClick) {
+        suppressClick = false;
+        evt.preventDefault();
+        evt.stopPropagation();
+      }
+    },
+    true
+  );
+  plugin.registerDomEvent(
+    root,
+    "contextmenu",
+    (evt) => {
+      if (!isCheckbox(evt.target))
+        return;
+      if (!plugin.settings.enableReadingModeLongPress)
+        return;
+      evt.preventDefault();
+      cancel();
+      openModalForCheckbox(plugin, evt.target);
+    },
+    true
+  );
+}
+async function openModalForCheckbox(plugin, checkbox) {
+  const view = findOwningMarkdownView(plugin, checkbox);
+  if (!view || !view.file)
+    return;
+  if (view.getMode() === "preview") {
+    openForReadingMode(plugin, view, checkbox);
+  } else {
+    openForLivePreview(plugin, view, checkbox);
+  }
+}
+function findOwningMarkdownView(plugin, node) {
+  let owner = null;
+  plugin.app.workspace.iterateAllLeaves((leaf) => {
+    if (owner)
+      return;
+    const v = leaf.view;
+    if (v instanceof import_obsidian4.MarkdownView && v.containerEl.contains(node))
+      owner = v;
+  });
+  return owner;
+}
+function openForReadingMode(plugin, view, checkbox) {
+  var _a, _b;
+  const file = view.file;
+  const previewRoot = view.previewMode.containerEl;
+  const all = previewRoot.querySelectorAll("input.task-list-item-checkbox");
+  const domIndex = Array.from(all).indexOf(checkbox);
+  if (domIndex < 0)
+    return;
+  const taskLines = ((_b = (_a = plugin.app.metadataCache.getFileCache(file)) == null ? void 0 : _a.listItems) != null ? _b : []).filter((li) => li.task !== void 0).map((li) => li.position.start.line);
+  const taskLine = taskLines[domIndex];
+  if (taskLine === void 0)
+    return;
+  new QuickActionModal(plugin.app, plugin, { kind: "file", file, line: taskLine }).open();
+}
+function openForLivePreview(plugin, view, checkbox) {
+  const editor = view.editor;
+  const cm = editor.cm;
+  if (!cm || typeof cm.posAtDOM !== "function")
+    return;
+  const pos = cm.posAtDOM(checkbox);
+  const lineCh = editor.offsetToPos(pos);
+  editor.setSelection({ line: lineCh.line, ch: 0 }, { line: lineCh.line, ch: 0 });
+  new QuickActionModal(plugin.app, plugin, { kind: "editor", editor }).open();
+}
 
 // src/commands/open-task-quick-menu.ts
 var changeTaskStatus = (plugin) => ({
   id: "change-task-status",
   name: "change task status",
-  // hotkeys: [{ modifiers: ["Mod", "Shift"], key: "l" }],
-  editorCallback: (editor, view) => {
-    new QuickActionModal(plugin.app, plugin, editor).open();
+  editorCallback: (editor, _view) => {
+    new QuickActionModal(plugin.app, plugin, { kind: "editor", editor }).open();
   }
 });
 var open_task_quick_menu_default = changeTaskStatus;
 
 // main.ts
-var TaskStatusPlugin = class extends import_obsidian4.Plugin {
-  /**
-   * Setup the plugin when it loads in obsidian
-   */
+var TaskStatusPlugin = class extends import_obsidian5.Plugin {
   async onload() {
     console.log("loading Obsidian Task Status");
     await this.loadSettings();
     register_ribbon_default(this);
+    registerCheckboxHandlers(this);
     this.addCommand(open_task_quick_menu_default(this));
     this.addSettingTab(new Settings(this.app, this));
   }
-  /**
-   * Teardown the plugin when it gets unloaded
-   */
   onunload() {
     console.log("unloading Obsidian Task Status");
   }
-  /**
-   * Trigger the rendering of the settings view
-   */
   async loadSettings() {
     this.settings = Object.assign({}, default_settings_default, await this.loadData());
   }
-  /**
-   * persist/save the plugin settings
-   */
   async saveSettings() {
     await this.saveData(this.settings);
   }
