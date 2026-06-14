@@ -7,10 +7,9 @@ import changeTaskStatus from 'src/commands/open-task-quick-menu';
 import DEFAULT_SETTINGS from 'src/default-settings';
 
 export default class TaskStatusPlugin extends Plugin implements TaskStatusPluginInterface {
-  settings: TaskStatusPluginSettings;
+  settings!: TaskStatusPluginSettings;
 
   async onload() {
-    console.log('loading Obsidian Task Status');
     await this.loadSettings();
     registerRibbon(this);
     registerCheckboxHandlers(this);

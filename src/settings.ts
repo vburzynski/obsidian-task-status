@@ -11,10 +11,11 @@ import DEFAULT_SETTINGS from './default-settings';
  * @returns
  */
 function swap<T>(arr: T[], indexA: number, indexB: number): void {
-  if (indexB < 0 || indexB === arr.length) return;
+  if (indexA < 0 || indexA >= arr.length) return;
+  if (indexB < 0 || indexB >= arr.length) return;
 
-  const temp = arr[indexA];
-  arr[indexA] = arr[indexB];
+  const temp = arr[indexA]!;
+  arr[indexA] = arr[indexB]!;
   arr[indexB] = temp;
 }
 
@@ -24,8 +25,10 @@ function swap<T>(arr: T[], indexA: number, indexB: number): void {
  * @param index the index of the item to move to the top
  */
 function moveToTop<T>(arr: T[], index: number): void {
-  const item = arr.splice(index, 1);
-  arr.unshift(item[0]);
+  if (index < 0 || index >= arr.length) return;
+
+  const item = arr.splice(index, 1)[0];
+  if (item !== undefined) arr.unshift(item);
 }
 
 export default class Settings extends PluginSettingTab {
@@ -97,7 +100,7 @@ export default class Settings extends PluginSettingTab {
             .setPlaceholder('name')
             .setValue(checkboxOption.title)
             .onChange(async (value) => {
-              this.plugin.settings.checkboxOptions[index].title = value;
+              this.plugin.settings.checkboxOptions[index]!.title = value;
               this.plugin.saveSettings();
             });
         })
@@ -106,7 +109,7 @@ export default class Settings extends PluginSettingTab {
             .setPlaceholder('character')
             .setValue(checkboxOption.character)
             .onChange(async (value) => {
-              this.plugin.settings.checkboxOptions[index].character = value;
+              this.plugin.settings.checkboxOptions[index]!.character = value;
               this.plugin.saveSettings();
             });
         })
