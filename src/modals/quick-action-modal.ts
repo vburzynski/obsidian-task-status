@@ -3,6 +3,9 @@ import SwapCheckboxStatus from "src/swap-checkbox-status";
 import swapInLine from "src/swap-line";
 import { CheckboxOption, ModalTarget, TaskStatusPluginInterface } from "src/types";
 
+/**
+ * A serchable modal that allows the user to select a checkbox status symbol
+ */
 export default class QuickActionModal extends SuggestModal<CheckboxOption> {
   plugin: TaskStatusPluginInterface;
   target: ModalTarget;
@@ -13,12 +16,22 @@ export default class QuickActionModal extends SuggestModal<CheckboxOption> {
     this.target = target;
   }
 
+  /**
+   * filters the checkbox options; the results are used as suggestions
+   * @param query the search string
+   * @returns collection of options
+   */
   getSuggestions(query: string): CheckboxOption[] {
     return this.plugin.settings.checkboxOptions.filter((option) =>
       option.title.toLowerCase().includes(query.toLowerCase())
     );
   }
 
+  /**
+   * renders each suggestion
+   * @param option the checkbox option to display
+   * @param el the suggestion HTML element
+   */
   renderSuggestion(option: CheckboxOption, el: HTMLElement) {
     el.setCssStyles({
       display: 'flex',
@@ -27,12 +40,14 @@ export default class QuickActionModal extends SuggestModal<CheckboxOption> {
       textAlign: 'center',
     });
 
+    // set a bunch of attributes so that the preview will be targeted by various themes
     el.setAttribute('data-task', option.character);
     el.classList.add('task-list-item');
     if (option.character !== ' ') {
       el.classList.add('is-checked');
     }
 
+    // show a preview of the checkbox
     const input = el.createEl('input', {
       attr: {
         'type': 'checkbox',
@@ -40,16 +55,23 @@ export default class QuickActionModal extends SuggestModal<CheckboxOption> {
       },
     });
 
+    // set a bunch of attributes so that the preview will be targeted by various themes
     input.classList.add('task-list-item');
     input.checked = option.character !== ' ';
     if (option.character !== ' ') {
       input.classList.add('is-checked');
     }
 
+    // show the name of the checkbox option
     const span = el.createEl("span", { text: option.title });
     span.classList.add('cm-list-1')
   }
 
+  /**
+   * Handler for when the user chooses an option
+   * @param option the option selected by the user
+   * @param evt the triggering mouse or keyboard event
+   */
   onChooseSuggestion(option: CheckboxOption, _evt: MouseEvent | KeyboardEvent) {
     if (this.target.kind === 'editor') {
       new SwapCheckboxStatus(this.target.editor).swap(option.character);
