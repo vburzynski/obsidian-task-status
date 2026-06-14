@@ -319,8 +319,7 @@ var default_settings_default = DEFAULT_SETTINGS;
 
 // src/settings.ts
 function swap(arr, indexA, indexB) {
-  if (indexB < 0 || indexB === arr.length)
-    return;
+  if (indexB < 0 || indexB === arr.length) return;
   const temp = arr[indexA];
   arr[indexA] = arr[indexB];
   arr[indexB] = temp;
@@ -526,8 +525,7 @@ ${selection}`);
   static transformNonTasks(original, target) {
     _SwapCheckboxStatus.nonTaskRegex.lastIndex = 0;
     const parts = _SwapCheckboxStatus.nonTaskRegex.exec(original);
-    if (parts === null)
-      return original;
+    if (parts === null) return original;
     const bullet = parts[3] || "-";
     return original.replace(_SwapCheckboxStatus.nonTaskRegex, `$2${bullet} [${target}] $4`);
   }
@@ -604,12 +602,10 @@ var swap_checkbox_status_default = SwapCheckboxStatus;
 // src/swap-line.ts
 function swapInLine(content, line, marker) {
   const lines = content.split("\n");
-  if (line < 0 || line >= lines.length)
-    return content;
+  if (line < 0 || line >= lines.length) return content;
   const original = lines[line];
   const replacement = swap_checkbox_status_default.replaceLine(original, marker);
-  if (replacement === original)
-    return content;
+  if (replacement === original) return content;
   lines[line] = replacement;
   return lines.join("\n");
 }
@@ -621,11 +617,21 @@ var QuickActionModal = class extends import_obsidian2.SuggestModal {
     this.plugin = plugin;
     this.target = target;
   }
+  /**
+   * filters the checkbox options; the results are used as suggestions
+   * @param query the search string
+   * @returns collection of options
+   */
   getSuggestions(query) {
     return this.plugin.settings.checkboxOptions.filter(
       (option) => option.title.toLowerCase().includes(query.toLowerCase())
     );
   }
+  /**
+   * renders each suggestion
+   * @param option the checkbox option to display
+   * @param el the suggestion HTML element
+   */
   renderSuggestion(option, el) {
     el.setCssStyles({
       display: "flex",
@@ -652,6 +658,11 @@ var QuickActionModal = class extends import_obsidian2.SuggestModal {
     const span = el.createEl("span", { text: option.title });
     span.classList.add("cm-list-1");
   }
+  /**
+   * Handler for when the user chooses an option
+   * @param option the option selected by the user
+   * @param evt the triggering mouse or keyboard event
+   */
   onChooseSuggestion(option, _evt) {
     if (this.target.kind === "editor") {
       new swap_checkbox_status_default(this.target.editor).swap(option.character);
@@ -679,8 +690,7 @@ var register_ribbon_default = (plugin) => {
     "Change Checkbox Status",
     (_event) => {
       const activeView = plugin.app.workspace.getActiveViewOfType(import_obsidian3.MarkdownView);
-      if (!activeView)
-        return;
+      if (!activeView) return;
       const editor = activeView.editor;
       new QuickActionModal(plugin.app, plugin, { kind: "editor", editor }).open();
     }
@@ -709,10 +719,8 @@ function registerCheckboxHandlers(plugin) {
     root,
     "pointerdown",
     (evt) => {
-      if (!isCheckbox(evt.target))
-        return;
-      if (!plugin.settings.enableReadingModeLongPress)
-        return;
+      if (!isCheckbox(evt.target)) return;
+      if (!plugin.settings.enableReadingModeLongPress) return;
       cancel();
       pendingTarget = evt.target;
       startX = evt.clientX;
@@ -721,8 +729,7 @@ function registerCheckboxHandlers(plugin) {
         const target = pendingTarget;
         timer = null;
         pendingTarget = null;
-        if (!target)
-          return;
+        if (!target) return;
         suppressClick = true;
         openModalForCheckbox(plugin, target);
       }, plugin.settings.longPressDurationMs);
@@ -733,12 +740,10 @@ function registerCheckboxHandlers(plugin) {
     root,
     "pointermove",
     (evt) => {
-      if (timer === null)
-        return;
+      if (timer === null) return;
       const dx = evt.clientX - startX;
       const dy = evt.clientY - startY;
-      if (dx * dx + dy * dy > MOVEMENT_THRESHOLD_PX * MOVEMENT_THRESHOLD_PX)
-        cancel();
+      if (dx * dx + dy * dy > MOVEMENT_THRESHOLD_PX * MOVEMENT_THRESHOLD_PX) cancel();
     },
     true
   );
@@ -749,8 +754,7 @@ function registerCheckboxHandlers(plugin) {
     root,
     "click",
     (evt) => {
-      if (!isCheckbox(evt.target))
-        return;
+      if (!isCheckbox(evt.target)) return;
       if (suppressClick) {
         suppressClick = false;
         evt.preventDefault();
@@ -763,10 +767,8 @@ function registerCheckboxHandlers(plugin) {
     root,
     "contextmenu",
     (evt) => {
-      if (!isCheckbox(evt.target))
-        return;
-      if (!plugin.settings.enableReadingModeLongPress)
-        return;
+      if (!isCheckbox(evt.target)) return;
+      if (!plugin.settings.enableReadingModeLongPress) return;
       evt.preventDefault();
       cancel();
       openModalForCheckbox(plugin, evt.target);
@@ -776,8 +778,7 @@ function registerCheckboxHandlers(plugin) {
 }
 async function openModalForCheckbox(plugin, checkbox) {
   const view = findOwningMarkdownView(plugin, checkbox);
-  if (!view || !view.file)
-    return;
+  if (!view || !view.file) return;
   if (view.getMode() === "preview") {
     openForReadingMode(plugin, view, checkbox);
   } else {
@@ -787,11 +788,9 @@ async function openModalForCheckbox(plugin, checkbox) {
 function findOwningMarkdownView(plugin, node) {
   let owner = null;
   plugin.app.workspace.iterateAllLeaves((leaf) => {
-    if (owner)
-      return;
+    if (owner) return;
     const v = leaf.view;
-    if (v instanceof import_obsidian4.MarkdownView && v.containerEl.contains(node))
-      owner = v;
+    if (v instanceof import_obsidian4.MarkdownView && v.containerEl.contains(node)) owner = v;
   });
   return owner;
 }
@@ -801,19 +800,16 @@ function openForReadingMode(plugin, view, checkbox) {
   const previewRoot = view.previewMode.containerEl;
   const all = previewRoot.querySelectorAll("input.task-list-item-checkbox");
   const domIndex = Array.from(all).indexOf(checkbox);
-  if (domIndex < 0)
-    return;
+  if (domIndex < 0) return;
   const taskLines = ((_b = (_a = plugin.app.metadataCache.getFileCache(file)) == null ? void 0 : _a.listItems) != null ? _b : []).filter((li) => li.task !== void 0).map((li) => li.position.start.line);
   const taskLine = taskLines[domIndex];
-  if (taskLine === void 0)
-    return;
+  if (taskLine === void 0) return;
   new QuickActionModal(plugin.app, plugin, { kind: "file", file, line: taskLine }).open();
 }
 function openForLivePreview(plugin, view, checkbox) {
   const editor = view.editor;
   const cm = editor.cm;
-  if (!cm || typeof cm.posAtDOM !== "function")
-    return;
+  if (!cm || typeof cm.posAtDOM !== "function") return;
   const pos = cm.posAtDOM(checkbox);
   const lineCh = editor.offsetToPos(pos);
   editor.setSelection({ line: lineCh.line, ch: 0 }, { line: lineCh.line, ch: 0 });
