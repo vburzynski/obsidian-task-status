@@ -5,6 +5,8 @@ export default function swapInLine(content: string, line: number, marker: string
   if (line < 0 || line >= lines.length) return content;
 
   const original = lines[line];
+  if (original === undefined) return content;
+
   const replacement = SwapCheckboxStatus.replaceLine(original, marker);
   if (replacement === original) return content;
 
