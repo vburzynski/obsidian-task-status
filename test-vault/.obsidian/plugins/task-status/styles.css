@@ -1,9 +1,0 @@
-/* Suppress iOS long-press selection callout / text selection on task checkboxes
-   so the long-press handler can open the status picker without competing with
-   the native iOS context menu. */
-input.task-list-item-checkbox {
-  -webkit-touch-callout: none;
-  -webkit-user-select: none;
-  user-select: none;
-  touch-action: manipulation;
-}

@@ -18,7 +18,4 @@ data.json
 .DS_Store
 
 # Exclude some test vault files
-test-vault/.obsidian/plugins/**/data.json
-test-vault/.obsidian/app.json
-test-vault/.obsidian/appearance.json
-test-vault/.obsidian/workspace.json
+test-vault/.obsidian/
