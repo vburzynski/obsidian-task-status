@@ -3,6 +3,7 @@ import { TaskStatusPluginInterface } from './types';
 import QuickActionModal from './modals/quick-action-modal';
 
 const MOVEMENT_THRESHOLD_PX = 10;
+const TIMER_CONTEXTMENU_WINDOW_MS = 1000;
 
 export default function registerCheckboxHandlers(plugin: TaskStatusPluginInterface) {
   const root = plugin.app.workspace.containerEl;
@@ -12,6 +13,7 @@ export default function registerCheckboxHandlers(plugin: TaskStatusPluginInterfa
   let startY = 0;
   let pendingTarget: HTMLInputElement | null = null;
   let suppressClick = false;
+  let lastTimerOpenAt = 0;
 
   const cancel = () => {
     if (timer !== null) {
@@ -40,6 +42,7 @@ export default function registerCheckboxHandlers(plugin: TaskStatusPluginInterfa
         pendingTarget = null;
         if (!target) return;
         suppressClick = true;
+        lastTimerOpenAt = Date.now();
         openModalForCheckbox(plugin, target);
       }, plugin.settings.longPressDurationMs);
     },
@@ -83,6 +86,9 @@ export default function registerCheckboxHandlers(plugin: TaskStatusPluginInterfa
       if (!isCheckbox(evt.target)) return;
       if (!plugin.settings.enableReadingModeLongPress) return;
       evt.preventDefault();
+      // On touch screens, a long press fires contextmenu shortly after our timer
+      // has already opened the modal; don't open a second one.
+      if (Date.now() - lastTimerOpenAt < TIMER_CONTEXTMENU_WINDOW_MS) return;
       cancel();
       openModalForCheckbox(plugin, evt.target);
     },
